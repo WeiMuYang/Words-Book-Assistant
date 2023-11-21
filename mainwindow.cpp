@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QDebug>
+#include "data_type.h"
 
 
 MainWindow::MainWindow(QWidget *parent,QApplication* app)
@@ -14,7 +15,8 @@ MainWindow::MainWindow(QWidget *parent,QApplication* app)
 
     operateFile_ = new OperateFile(this);
     netWorkAccess_ = new NetworkAccess(this);
-//    netWorkAccess_->Access();
+    connect(netWorkAccess_,&NetworkAccess::sendWordInfo,this, &MainWindow::appendWordInfoSlot);
+    connect(netWorkAccess_,&NetworkAccess::sendSentenceInfo,this, &MainWindow::appendSentenceInfoSlot);
 }
 
 MainWindow::~MainWindow()
@@ -26,22 +28,30 @@ void MainWindow::getWordsSlot(WordsType status, QString words)
 {
     switch (status) {
     case IsWord:
-        if(operateFile_->appendWord(words)) {
-            qDebug() << "append Word succeed ";
-        }else{
-            qDebug() << "append Word fauiled ";
-        }
-
+        netWorkAccess_->accessWord(words);
         break;
     case IsSentence:
-        if(operateFile_->appendSentence(words)) {
-            qDebug() << "append Word succeed ";
-        }else{
-            qDebug() << "append Word fauiled ";
-        }
+        netWorkAccess_->accessSentence(words);
         break;
     default:
         break;
     }
 }
 
+void MainWindow::appendWordInfoSlot(WordInfo wordInfo) {
+
+    if(operateFile_->appendWord(wordInfo)) {
+        qDebug() << "append Word succeed ";
+    }else{
+        qDebug() << "append Word fauiled ";
+    }
+}
+
+void MainWindow::appendSentenceInfoSlot(WordInfo wordInfo) {
+
+    if(operateFile_->appendSentence(wordInfo)) {
+        qDebug() << "append Sentence succeed ";
+    }else{
+        qDebug() << "append Sentence fauiled ";
+    }
+}

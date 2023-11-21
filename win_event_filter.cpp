@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <QApplication>
 #include <QClipboard>
+#include <QRegularExpression>
 
 //QString punctuation = QString::fromUtf8(" !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~");
 QString punctuation = QString::fromUtf8(" !\"'()*,-.:;<>?[]_|~");
@@ -17,13 +18,14 @@ bool WinEventFilter::nativeEventFilter(const QByteArray &eventType, void *messag
             QClipboard *clipboard = QApplication::clipboard();
             // 获取剪贴板内容
             clipText_ = clipboard->text();
+            // 去掉前后空格
+            clipText_ = clipText_.trimmed();
             qDebug() << clipText_;
             WordsType type;
             if(getWords(type))
                 emit sendWords(type, clipText_);
         }
     }
-    //返回false消息继续向上传递，返回true消息不继续向上传递
     return false;
 }
 

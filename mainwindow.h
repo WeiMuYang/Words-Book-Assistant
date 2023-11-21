@@ -20,6 +20,8 @@ public:
 
 public slots:
     void getWordsSlot(WordsType status, QString words);
+    void appendWordInfoSlot(WordInfo wordInfo);
+    void appendSentenceInfoSlot(WordInfo wordInfo);
 
 private:
     Ui::MainWindow *ui;

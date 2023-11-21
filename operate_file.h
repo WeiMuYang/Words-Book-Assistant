@@ -2,7 +2,7 @@
 #define OPERATEFILE_H
 
 #include <QObject>
-#include "win_event_filter.h"
+#include "data_type.h"
 class OperateFile : public QObject
 {
     Q_OBJECT
@@ -10,8 +10,8 @@ public:
     explicit OperateFile(QObject *parent = nullptr);
 
 public slots:
-    bool appendWord(QString words);
-    bool appendSentence(QString sentence);
+    bool appendWord(WordInfo wordInfo);
+    bool appendSentence(WordInfo sentence);
 
 signals:
 

@@ -16,6 +16,7 @@ SOURCES += \
     win_event_filter.cpp
 
 HEADERS += \
+    data_type.h \
     mainwindow.h \
     network_access.h \
     operate_file.h \
