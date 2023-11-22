@@ -1,0 +1,30 @@
+{
+    "ImagePath": [
+        {
+            "Desktop": "Desktop"
+        }
+    ],
+    "TargetPath": [
+        {
+            "生活相关": "F:/01-life-records"
+        }
+    ],
+    "Interval": [
+        "1 hours",
+        "1 days",
+        "2 days",
+        "today"
+    ],
+    "AssetsType": [
+        "99-*.png",
+        "99-*.jpg",
+        "99-*.bmp",
+        "99-*.jpeg",
+        "99-*.gif",
+        "99-*.mp4"
+    ],
+    "Software": {
+        "Typora": "D:/Program Files/Typora/Typora.exe",
+        "Vscode": "D:/Users/yang-wei-da/AppData/Local/Programs/Microsoft VS Code/Code.exe"
+    }
+}

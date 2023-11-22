@@ -3,11 +3,15 @@
 
 #include <QObject>
 #include "data_type.h"
-class OperateFile : public QObject
+class FileOperation : public QObject
 {
     Q_OBJECT
 public:
-    explicit OperateFile(QObject *parent = nullptr);
+    explicit FileOperation(QObject *parent = nullptr);
+
+    bool readIniFile(QString iniPath, IniInfo &iniInfo);
+    bool readUserFile(QString usrPath,UserInfo &userInfo);
+    void analysisJson(QJsonObject &rootObj,UserInfo &userInfo);
 
 public slots:
     bool appendWord(WordInfo wordInfo);
@@ -19,7 +23,6 @@ private:
     QString wordPath_;
     QString website_;
     QString audio_;
-
 };
 
 #endif // OPERATEFILE_H

@@ -68,7 +68,7 @@ void NetworkAccess::analysisWordInfo(const QByteArray& Data) {
     // 当前单词信息
     WordInfo curWordInfo;
     if(listStr.size() > 1){
-        curWordInfo.m_word = wordSentence_;
+        curWordInfo.m_Word = wordSentence_;
         curWordInfo.m_Phonetic_UK = getWordPhonetic(listStr.first());
         for(int i = 1; i < listStr.size()-1; ++i) {
             qDebug() << listStr.at(i);
@@ -99,7 +99,7 @@ void NetworkAccess::analysisSentenceInfo(const QByteArray& Data) {
     // 当前单词信息
     if(!dataStr.isEmpty()){
         WordInfo curWordInfo;
-        curWordInfo.m_word = wordSentence_;
+        curWordInfo.m_Word = wordSentence_;
         curWordInfo.m_Translation.append(dataStr);
         emit sendSentenceInfo(curWordInfo);
     }

@@ -1,0 +1,23 @@
+{
+    "?RepoPath": "资源目录的路径，Desktop代表的是当前用户的桌面",
+    "RepoPath": [
+        {
+            "LELTS-Word": "H:/00-sync-file-work/04-IELTS-Word"
+        },
+        {
+            "Work-Word": "H:/00-sync-file-work/04-Work-Word"
+        }
+    ],
+    "?Software": "软件名+路径",
+    "Software": {
+        "Typora": "D:/Typora/Typora.exe",
+        "Vscode": "D:/Microsoft VS Code/Code.exe"
+    },
+    "?Dictionary": "翻译和发音的网页",
+    "Dictionary": {
+        "TranslateWeb": "https://dictionary.cambridge.org/dictionary/english-chinese-simplified/",
+        "PronunciationWeb": "http://dict.youdao.com/dictvoice?type=0&audio="
+    },
+    "?Symbols": " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~",
+    "Symbols": " ,-.:;[]_"
+}
