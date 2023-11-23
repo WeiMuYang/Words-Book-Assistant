@@ -4,9 +4,26 @@
 #include <QClipboard>
 #include <QRegularExpression>
 
-//QString punctuation = QString::fromUtf8(" !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~");
-QString punctuation = QString::fromUtf8(" !\"'()*,-.:;<>?[]_|~");
+//QString symbols_ = QString::fromUtf8(" !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~");
 
+WinEventFilter::WinEventFilter(QObject * parent) : QObject(parent) {
+    // 添加小写字母
+    for (char c = 'a'; c <= 'z'; ++c) {
+        letters_.append(c);
+    }
+    // 添加大写字母
+    for (char c = 'A'; c <= 'Z'; ++c) {
+        letters_.append(c);
+    }
+    symbols_ = QString::fromUtf8(" !\"'()*,-.:;<>?[]_|~");
+}
+
+void WinEventFilter::setSymbols(QString p)
+{
+    qDebug() << p;
+//    symbols_.clear();
+//    symbols_ = p;
+}
 
 bool WinEventFilter::nativeEventFilter(const QByteArray &eventType, void *message, long *result){
     Q_UNUSED(result)
@@ -35,7 +52,7 @@ bool WinEventFilter::getWords(WordsType& type){
     for(int i = 0; i < clipText_.length(); i++){
         if(!clipText_[i].isLower() && !clipText_[i].isUpper()) {
             type = IsSentence;
-            if(punctuation.indexOf(clipText_[i]) == -1) {
+            if(symbols_.indexOf(clipText_[i]) == -1) {
                 isWordOrSentence = false;
                 break;
             }

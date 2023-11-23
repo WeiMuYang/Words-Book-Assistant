@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QListWidgetItem>
+#include <QTextStream>
 #include "win_event_filter.h"
 #include "file_operation.h"
 #include "network_access.h"
@@ -22,14 +24,18 @@ public:
     void setWindowStyle();
     bool getConfPath(QString& iniPath, QString& confDirPath);
     void initConfInfo();
+    void initWordSentList();
+    void updateListWgt();
 
 public slots:
     void getWordsSlot(WordsType status, QString words);
-    void appendWordInfoSlot(WordInfo wordInfo);
-    void appendSentenceInfoSlot(WordInfo wordInfo);
+    void appendWordInfoSlot(WordSentInfo wordInfo);
+    void appendSentenceInfoSlot(WordSentInfo wordInfo);
     void initActions();
     void appendTextToLog(QString log);
-
+    void addWordListSlot(WordSentInfo wordInfo);
+    void itemEnteredSlot(QListWidgetItem *item);
+    void addSentenceListSlot(WordSentInfo Sentence);
 private:
     Ui::MainWindow *ui;
     WinEventFilter *winEventFilter_;
@@ -39,5 +45,8 @@ private:
     OpenExProgram *openExPro_;
     IniInfo iniInfo_;
     UserInfo userInfo_;
+    QVector<WordSentInfo> wordSentList_;
+    int multiple_;
+
 };
 #endif // MAINWINDOW_H

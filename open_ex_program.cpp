@@ -4,48 +4,39 @@
 
 OpenExProgram::OpenExProgram()
 {
-
 }
 
-void OpenExProgram::setSoftWarePath(QMap<QString, QString> softWarePath)
+void OpenExProgram::setTyporaPath(QString typoraPath)
 {
-    softWarePathMap_.swap(softWarePath);
+    typoraPath_ = typoraPath;
 }
 
-QString OpenExProgram::getPathByKey(QString key){
-    auto it = softWarePathMap_.find(key);
-    if(it == softWarePathMap_.end()){
-        emit sigOpenExProLog("Can't find SoftWare: " + key + "'s Path!!!");
-        return QString("");
-    }else{
-        return it.value();
-    }
+void OpenExProgram::setVscodePath(QString vscodePath)
+{
+    vscodePath_ = vscodePath;
 }
 
 void OpenExProgram::OpenMarkdownAndDirSlot(QString fileName){
     QProcess* pProcess = new QProcess;
     if(fileName.size() > 3 && fileName.right(3) == ".md"){
-        QString pathTypora = getPathByKey("Typora");
-        if(!pathTypora.isEmpty()){
-            pProcess->start(pathTypora, QStringList(fileName));
+        if(!typoraPath_.isEmpty()){
+            pProcess->start(typoraPath_, QStringList(fileName));
         }
     }else{
-        QString pathVsCode = getPathByKey("Vscode");
-        if(!pathVsCode.isEmpty()){
-            pProcess->start(pathVsCode, QStringList(fileName));
+        if(!vscodePath_.isEmpty()){
+            pProcess->start(vscodePath_, QStringList(fileName));
         }
     }
 }
 
 void OpenExProgram::CompareFileSlot(QString fileNameA, QString fileNameB){
     QProcess* pProcess = new QProcess;
-    QString pathVsCode = getPathByKey("Vscode");
-    if(!pathVsCode.isEmpty()){
+    if(!vscodePath_.isEmpty()){
         QStringList list;
         list.append("--diff");
         list.append(fileNameA);
         list.append(fileNameB);
-        pProcess->start(pathVsCode, list);
+        pProcess->start(vscodePath_, list);
         pProcess->waitForFinished();
     }
 
@@ -53,9 +44,8 @@ void OpenExProgram::CompareFileSlot(QString fileNameA, QString fileNameB){
 
 void OpenExProgram::OpenJsonAndIniSlot(QString fileName){
     QProcess* pProcess = new QProcess;
-    QString pathVsCode = getPathByKey("Vscode");
-    if(!pathVsCode.isEmpty()){
-        pProcess->start(pathVsCode, QStringList(fileName));
+    if(!vscodePath_.isEmpty()){
+        pProcess->start(vscodePath_, QStringList(fileName));
         pProcess->waitForFinished();
     }
 }

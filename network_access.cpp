@@ -12,12 +12,16 @@ NetworkAccess::NetworkAccess(QObject *parent)
     : QObject{parent}
 {
     manager_ = new QNetworkAccessManager(this);
+    translateWeb_ = "https://dict.youdao.com/result?word=%word%&lang=en";
     qDebug() << "OpenSSL支持情况:" << QSslSocket::supportsSsl();
 }
 
 void NetworkAccess::accessWord(QString word){
     wordSentence_ = word;
-    request_.setUrl(QUrl(u8"https://dict.youdao.com/result?word=" + word + "&lang=en"));
+    QString web = translateWeb_;
+    web = web.replace("%word%" ,word);
+    request_.setUrl(QUrl(web));
+//    request_.setUrl(QUrl(u8"https://dict.youdao.com/result?word=" + word + "&lang=en"));
     // 发送请求并获取响应
     reply_ = manager_->get(request_);
     // 当请求完成时，响应数据可用
@@ -66,9 +70,9 @@ void NetworkAccess::analysisWordInfo(const QByteArray& Data) {
     QString dataStr = QString(Data);
     QStringList listStr = dataStr.split(wordSplit);
     // 当前单词信息
-    WordInfo curWordInfo;
+    WordSentInfo curWordInfo;
     if(listStr.size() > 1){
-        curWordInfo.m_Word = wordSentence_;
+        curWordInfo.m_WordSent = wordSentence_;
         curWordInfo.m_Phonetic_UK = getWordPhonetic(listStr.first());
         for(int i = 1; i < listStr.size()-1; ++i) {
             qDebug() << listStr.at(i);
@@ -98,8 +102,8 @@ void NetworkAccess::analysisSentenceInfo(const QByteArray& Data) {
     qDebug() << dataStr;
     // 当前单词信息
     if(!dataStr.isEmpty()){
-        WordInfo curWordInfo;
-        curWordInfo.m_Word = wordSentence_;
+        WordSentInfo curWordInfo;
+        curWordInfo.m_WordSent = wordSentence_;
         curWordInfo.m_Translation.append(dataStr);
         emit sendSentenceInfo(curWordInfo);
     }
@@ -127,8 +131,11 @@ void NetworkAccess::replySentenceFinishedSlot()
 
 void NetworkAccess::accessSentence(QString sentence){
     wordSentence_ = sentence;
-    QByteArray encodedString = QUrl::toPercentEncoding(sentence);
-    request_.setUrl(QUrl(u8"https://dict.youdao.com/result?word=" + encodedString + "&lang=en"));
+    QString encodedString = QUrl::toPercentEncoding(sentence);
+    QString web = translateWeb_;
+    web = web.replace("%word%" ,encodedString);
+    request_.setUrl(QUrl(web));
+//    request_.setUrl(QUrl(u8"https://dict.youdao.com/result?word=" + encodedString + "&lang=en"));
     // 发送请求并获取响应
     reply_ = manager_->get(request_);
     // 当请求完成时，响应数据可用

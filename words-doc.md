@@ -25,3 +25,24 @@
 
 <p><a href=https://dictionary.cambridge.org/spellcheck/english-chinese-simplified/?q=Add+control+logic+for+tires,+wheels+and+hood.>Add control logic for tires, wheels and hood.</a> &nbsp; &nbsp;  &nbsp; &nbsp; <audio src=http://dict.youdao.com/dictvoice?type=0&audio=Add%20control%20logic%20for%20tires%2C%20wheels%20and%20hood. style="width:101px; height: 12px"></audio> </p> 
 - 增加轮胎、车轮和引擎盖的控制逻辑。
+
+<p><a href=https://dictionary.cambridge.org/dictionary/english-chinese-simplified/Book>Book</a> &nbsp; &nbsp;/ bʊk / &nbsp; &nbsp; <audio src=http://dict.youdao.com/dictvoice?type=0&audio=Book style="width:101px; height: 12px"></audio> </p> 
+- n.  书，书籍；本子，簿册；（长篇作品的）篇，卷，部；装订成册之物；赌局，打赌；账册，账簿   
+- v.  预订，预约；（警方）将……记录在案；（裁判）记名警告  
+
+<p><a href=https://dictionary.cambridge.org/dictionary/english-chinese-simplified/?q=error+is+usually+caused+by+your+computer>error is usually caused by your computer</a> &nbsp; &nbsp;  &nbsp; &nbsp; <audio src=http://dict.youdao.com/dictvoice?type=0&audio=error%20is%20usually%20caused%20by%20your%20computer style="width:101px; height: 12px"></audio> </p> 
+- 
+
+
+<p><a href=https://dictionary.cambridge.org/dictionary/english-chinese-simplified/?q=I+just+found+out+that>I just found out that</a> &nbsp; &nbsp;  &nbsp; &nbsp; <audio src=http://dict.youdao.com/dictvoice?type=0&audio=I%20just%20found%20out%20that style="width:101px; height: 12px"></audio> </p> 
+- 我刚知道
+
+<p><a href=https://dictionary.cambridge.org/dictionary/english-chinese-simplified/similar>similar</a> &nbsp; &nbsp;/ ˈsɪmələ(r) / &nbsp; &nbsp; <audio src=http://dict.youdao.com/dictvoice?type=0&audio=similar style="width:101px; height: 12px"></audio> </p> 
+- adj.  相像的，类似的；（几何图形）相似的   
+- n.  &lt;古&gt;相似之人（或物）；顺势药物（指疗效与某些疾病症状相似的药物，为顺势疗法的基础）  
+
+<p><a href=https://dictionary.cambridge.org/dictionary/english-chinese-simplified/?q=Chen+Nanli>Chen Nanli</a> &nbsp; &nbsp;  &nbsp; &nbsp; <audio src=http://dict.youdao.com/dictvoice?type=0&audio=Chen%20Nanli style="width:101px; height: 12px"></audio> </p> 
+- 陈南丽
+
+<p><a href=https://dictionary.cambridge.org/dictionary/english-chinese-simplified/successfully>successfully</a> &nbsp; &nbsp;/ səkˈsesfəli / &nbsp; &nbsp; <audio src=http://dict.youdao.com/dictvoice?type=0&audio=successfully style="width:101px; height: 12px"></audio> </p> 
+- adv.  成功地；顺利地  

@@ -12,8 +12,8 @@ FileOperation::FileOperation(QObject *parent)
     : QObject{parent}
 {
     wordPath_ = "../words-doc.md";
-    website_ = "https://dictionary.cambridge.org/dictionary/english-chinese-simplified/";
-    audio_ = "http://dict.youdao.com/dictvoice?type=0&audio=";
+    cambridgeWordWeb_ = "https://dictionary.cambridge.org/dictionary/english-chinese-simplified/";
+    pronunciationWeb_ = "http://dict.youdao.com/dictvoice?type=0&audio=";
 }
 
 bool FileOperation::readIniFile(QString iniPath, IniInfo &iniInfo)
@@ -101,15 +101,22 @@ void FileOperation::analysisJson(QJsonObject &rootObj,UserInfo &userInfo){
         QString value = DictPathMap[key].toString();
         if(key == "TranslateWeb") {
             userInfo.m_TranslateWeb = value;
-        }else {
+        }else if(key == "CambridgeWordWeb"){
+            userInfo.m_CambridgeWordWeb = value;
+            cambridgeWordWeb_ = value;
+        }else if(key == "CambridgeSentWeb"){
+            userInfo.m_CambridgeSentWeb = value;
+            cambridgeSentWeb_ = value;
+        }else{ //
             userInfo.m_PronunciationWeb = value;
+            pronunciationWeb_ = value;
         }
     }
     userInfo.m_Symbols = rootObj["Symbols"].toString();
 }
 
-bool FileOperation::appendWord(WordInfo wordInfo){
-    QString words = wordInfo.m_Word;
+bool FileOperation::appendWord(WordSentInfo wordInfo){
+    QString words = wordInfo.m_WordSent;
     QFile file(wordPath_);
     if (!file.open(QIODevice::Append | QIODevice::Text))
     {
@@ -117,10 +124,15 @@ bool FileOperation::appendWord(WordInfo wordInfo){
         return false;
     }
     QTextStream stream(&file);
-    stream << "\n<p><a href=https://dictionary.cambridge.org/dictionary/english-chinese-simplified/"
-           << wordInfo.m_Word << ">" << wordInfo.m_Word << "</a> &nbsp; &nbsp;/" << wordInfo.m_Phonetic_UK
-           << "/ &nbsp; &nbsp; <audio src=http://dict.youdao.com/dictvoice?type=0&audio=" << wordInfo.m_Word
+//    stream << "\n<p><a href=https://dictionary.cambridge.org/dictionary/english-chinese-simplified/"
+//           << wordInfo.m_WordSent << ">" << wordInfo.m_WordSent << "</a> &nbsp; &nbsp;/" << wordInfo.m_Phonetic_UK
+//           << "/ &nbsp; &nbsp; <audio src=http://dict.youdao.com/dictvoice?type=0&audio=" << wordInfo.m_WordSent
+//           << " style=\"width:101px; height: 12px\"></audio> </p> \n";
+    stream << "\n<p><a href=" << cambridgeWordWeb_
+           << wordInfo.m_WordSent << ">" << wordInfo.m_WordSent << "</a> &nbsp; &nbsp;/" << wordInfo.m_Phonetic_UK
+           << "/ &nbsp; &nbsp; <audio src=" << pronunciationWeb_ << wordInfo.m_WordSent
            << " style=\"width:101px; height: 12px\"></audio> </p> \n";
+
     for(int i = 0; i < wordInfo.m_Translation.size(); ++i) {
         stream << "- " << wordInfo.m_Translation.at(i) << "\n";
     }
@@ -130,7 +142,7 @@ bool FileOperation::appendWord(WordInfo wordInfo){
     return true;
 }
 
-bool FileOperation::appendSentence(WordInfo sentence){
+bool FileOperation::appendSentence(WordSentInfo sentence){
     QFile file(wordPath_);
     if (!file.open(QIODevice::Append | QIODevice::Text))
     {
@@ -138,19 +150,17 @@ bool FileOperation::appendSentence(WordInfo sentence){
         return false;
     }
     QTextStream stream(&file);
-    QString cambridge = sentence.m_Word;
-    cambridge = cambridge.replace(" ","+");
+    QString replaceSpaceSent = sentence.m_WordSent;
+    replaceSpaceSent = replaceSpaceSent.replace(" ","+");
 
-    stream <<"\n<p><a href=https://dictionary.cambridge.org/spellcheck/english-chinese-simplified/?q=" << cambridge
-           << ">" << sentence.m_Word << "</a> &nbsp; &nbsp;  &nbsp; &nbsp; <audio src=http://dict.youdao.com/dictvoice?type=0&audio="
-           << QUrl::toPercentEncoding(sentence.m_Word) << " style=\"width:101px; height: 12px\"></audio> </p> \n";
-
+//    stream <<"\n<p><a href=https://dictionary.cambridge.org/spellcheck/english-chinese-simplified/?q=" << cambridge
+//           << ">" << sentence.m_WordSent << "</a> &nbsp; &nbsp;  &nbsp; &nbsp; <audio src=http://dict.youdao.com/dictvoice?type=0&audio="
+//           << QUrl::toPercentEncoding(sentence.m_WordSent) << " style=\"width:101px; height: 12px\"></audio> </p> \n";
+    stream <<"\n<p><a href=" << cambridgeSentWeb_ << replaceSpaceSent
+           << ">" << sentence.m_WordSent << "</a> &nbsp; &nbsp;  &nbsp; &nbsp; <audio src=" << pronunciationWeb_
+           << QUrl::toPercentEncoding(sentence.m_WordSent) << " style=\"width:101px; height: 12px\"></audio> </p> \n";
     stream <<"- "<< sentence.m_Translation.first() << "\n";
     file.close();
     qDebug() << "文本已成功追加到文件中。";
     return true;
 }
-
-
-
-

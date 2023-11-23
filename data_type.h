@@ -4,8 +4,8 @@
 #include <QStringList>
 #include <QVector>
 
-struct WordInfo {
-    QString m_Word;
+struct WordSentInfo {
+    QString m_WordSent;
     QString m_Phonetic_UK;
     QStringList m_Translation; // n. 名词
 };
@@ -28,6 +28,8 @@ struct UserInfo{
     QVector<RepoNamePath> m_RepoPathList;
     QString m_TyporaPath;
     QString m_VsCodePath;
+    QString m_CambridgeWordWeb;
+    QString m_CambridgeSentWeb;
     QString m_TranslateWeb;
     QString m_PronunciationWeb;
     QString m_Symbols;

@@ -10,8 +10,8 @@ class OpenExProgram: public QObject
     Q_OBJECT
 public:
     OpenExProgram();
-    void setSoftWarePath(QMap<QString,QString> softWarePath);
-    QString getPathByKey(QString key);
+    void setTyporaPath(QString typoraPath);
+    void setVscodePath(QString vscodePath);
 public slots:
     void OpenMarkdownAndDirSlot(QString fileName);
     void CompareFileSlot(QString fileNameA, QString fileNameB);
@@ -21,8 +21,8 @@ public slots:
 signals:
     void sigOpenExProLog(QString log);
 private:
-
-    QMap<QString,QString> softWarePathMap_;
+    QString typoraPath_;
+    QString vscodePath_;
 };
 
 #endif // OPENEXPROGRAM_H

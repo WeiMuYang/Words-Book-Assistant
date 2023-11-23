@@ -14,15 +14,16 @@ public:
     void analysisJson(QJsonObject &rootObj,UserInfo &userInfo);
 
 public slots:
-    bool appendWord(WordInfo wordInfo);
-    bool appendSentence(WordInfo sentence);
+    bool appendWord(WordSentInfo wordInfo);
+    bool appendSentence(WordSentInfo sentence);
 
 signals:
 
 private:
     QString wordPath_;
-    QString website_;
-    QString audio_;
+    QString cambridgeWordWeb_;
+    QString cambridgeSentWeb_;
+    QString pronunciationWeb_;
 };
 
 #endif // OPERATEFILE_H
