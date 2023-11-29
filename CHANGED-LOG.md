@@ -17,4 +17,5 @@
 - 添加单词的剑桥链接  
 - 添加单词的有道发音  
 - 自动获取单词的信息实现方式:  [全局热键实现.md](全局热键实现.md)  
-- 测试用的单词本:  [words-doc.md](words-doc.md) 
+- 测试用的单词本:  [words-doc.md](words-doc.md)  
+- 修改utf编码的脚本:  [codeUTF8.py](codeUTF8.py)     `python3  codeUTF8.py file.cpp`

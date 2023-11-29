@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QSslSocket>
 #include <QRegExp>
+#include <QTextCodec>
 
 const QString wordSplit = "<span class=\"pos\"";
 const QString phonetic = ">英</span><span class=\"phonetic\"";
@@ -21,7 +22,7 @@ void NetworkAccess::accessWord(QString word){
     QString web = translateWeb_;
     web = web.replace("%word%" ,word);
     request_.setUrl(QUrl(web));
-//    request_.setUrl(QUrl(u8"https://dict.youdao.com/result?word=" + word + "&lang=en"));
+    //    request_.setUrl(QUrl(u8"https://dict.youdao.com/result?word=" + word + "&lang=en"));
     // 发送请求并获取响应
     reply_ = manager_->get(request_);
     // 当请求完成时，响应数据可用
@@ -99,7 +100,6 @@ void NetworkAccess::analysisSentenceInfo(const QByteArray& Data) {
     dataStr = dataStr.remove(pos, dataStr.size()-1);
     pos = dataStr.indexOf('>');
     dataStr = dataStr.remove(0, pos+1);
-    qDebug() << dataStr;
     // 当前单词信息
     if(!dataStr.isEmpty()){
         WordSentInfo curWordInfo;
@@ -135,7 +135,7 @@ void NetworkAccess::accessSentence(QString sentence){
     QString web = translateWeb_;
     web = web.replace("%word%" ,encodedString);
     request_.setUrl(QUrl(web));
-//    request_.setUrl(QUrl(u8"https://dict.youdao.com/result?word=" + encodedString + "&lang=en"));
+    //    request_.setUrl(QUrl(u8"https://dict.youdao.com/result?word=" + encodedString + "&lang=en"));
     // 发送请求并获取响应
     reply_ = manager_->get(request_);
     // 当请求完成时，响应数据可用

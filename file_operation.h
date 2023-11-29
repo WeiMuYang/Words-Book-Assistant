@@ -13,11 +13,17 @@ public:
     bool readUserFile(QString usrPath,UserInfo &userInfo);
     void analysisJson(QJsonObject &rootObj,UserInfo &userInfo);
 
+    QStringList getSubDirNames(QString TarPath);
+    bool getFileNameByNum(QString fullPath, int fileNum, QString& fileName);
+    int getLastmodifiedTimeFileNumSubDir(const QString &path,const QString &dirName,QString& lastModefyFile);
+
+
 public slots:
     bool appendWord(WordSentInfo wordInfo);
     bool appendSentence(WordSentInfo sentence);
 
 signals:
+    void sigFileOperationLog(QString m);
 
 private:
     QString wordPath_;

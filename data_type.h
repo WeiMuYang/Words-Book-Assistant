@@ -36,4 +36,13 @@ struct UserInfo{
 };
 
 
+typedef enum {
+    High, Low
+}ScreenRes;
+
+typedef enum {
+    None, SubCombox, NumSpinBox
+}BoxSelect;
+
+
 #endif // DATA_TYPE_H

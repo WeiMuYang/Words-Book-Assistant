@@ -6,6 +6,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QDir>
 #include "data_type.h"
 
 FileOperation::FileOperation(QObject *parent)
@@ -164,3 +165,60 @@ bool FileOperation::appendSentence(WordSentInfo sentence){
     qDebug() << "文本已成功追加到文件中。";
     return true;
 }
+
+QStringList FileOperation::getSubDirNames(QString TarPath){
+    QStringList dirList;
+    QDir Root(TarPath);
+    QFileInfoList fileList = Root.entryInfoList(QDir::NoDotAndDotDot | QDir::Dirs, QDir::Time);
+    for(auto it = fileList.begin(); it < fileList.end(); ++it){
+        dirList << it->fileName();
+    }
+    return dirList;
+}
+
+bool FileOperation::getFileNameByNum(QString fullPath, int fileNum, QString& fileName){
+    QDir dir(fullPath);
+    QStringList filters;
+    QString nameNum = QString("%1").arg(fileNum, 2, 10, QLatin1Char('0'))+"*";
+    filters << nameNum;
+    dir.setFilter(QDir::AllEntries);
+    dir.setNameFilters(filters);
+    QFileInfoList fileInfoList = dir.entryInfoList();
+    if(fileInfoList.size() > 1) {
+        QString msg;
+        msg = QString("包含") + QString::number(fileInfoList.size())+ QString("个序号为： \"") + QString("%1").arg(fileNum, 2, 10, QLatin1Char('0')) + QString("\" 的markdown文件：\n");
+        for(auto it = fileInfoList.begin(); it < fileInfoList.end(); it++){
+            msg += it->fileName() + ", ";
+        }
+        msg[msg.size()-2] = '!';
+        emit sigFileOperationLog(msg);
+    }else if(fileInfoList.size() < 1){
+        QString msg;
+        msg = QString("序号为：\"") + QString("%1").arg(fileNum, 2, 10, QLatin1Char('0')) + QString("\"的文件or目录不存在！").toUtf8();
+        emit sigFileOperationLog(msg);
+        return false;
+    }
+
+    fileName = fileInfoList.last().fileName();
+    //    emit sigFileOperationLog(QString("当前文档/目录为：")+fileName);
+    return true;
+}
+
+int FileOperation::getLastmodifiedTimeFileNumSubDir(const QString &path,const QString &dirName,QString& lastModefyFile)
+{
+    int num;
+    QDir dir(path+"/"+dirName);
+    QStringList filters;
+    filters << "*.md"<< "\?\?-*";
+    dir.setNameFilters(filters);
+    QFileInfoList list = dir.entryInfoList(QDir::AllEntries, QDir::Time);
+    if(list.isEmpty()){
+        emit sigFileOperationLog("Directory: \"" + path + dirName + "\" does not exist files!");
+        return -1;
+    }
+    lastModefyFile = list.first().fileName();
+    QStringList nameArr = lastModefyFile.split("-");
+    num = nameArr.at(0).toInt();
+    return num;
+}
+
