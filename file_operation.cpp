@@ -12,9 +12,15 @@
 FileOperation::FileOperation(QObject *parent)
     : QObject{parent}
 {
-    wordPath_ = "../words-doc.md";
     cambridgeWordWeb_ = "https://dictionary.cambridge.org/dictionary/english-chinese-simplified/";
     pronunciationWeb_ = "http://dict.youdao.com/dictvoice?type=0&audio=";
+}
+
+bool isMarkdownFile(QString fileName){
+    if(fileName.size() >= 5 && fileName.right(3) == ".md"){
+        return true;
+    }
+    return false;
 }
 
 bool FileOperation::readIniFile(QString iniPath, IniInfo &iniInfo)
@@ -116,9 +122,9 @@ void FileOperation::analysisJson(QJsonObject &rootObj,UserInfo &userInfo){
     userInfo.m_Symbols = rootObj["Symbols"].toString();
 }
 
-bool FileOperation::appendWord(WordSentInfo wordInfo){
+bool FileOperation::appendWord(const QString& path, WordSentInfo wordInfo){
     QString words = wordInfo.m_WordSent;
-    QFile file(wordPath_);
+    QFile file(path);
     if (!file.open(QIODevice::Append | QIODevice::Text))
     {
         qDebug() << "无法打开文件进行追加操作。";
@@ -143,8 +149,8 @@ bool FileOperation::appendWord(WordSentInfo wordInfo){
     return true;
 }
 
-bool FileOperation::appendSentence(WordSentInfo sentence){
-    QFile file(wordPath_);
+bool FileOperation::appendSentence(const QString& path,WordSentInfo sentence){
+    QFile file(path);
     if (!file.open(QIODevice::Append | QIODevice::Text))
     {
         qDebug() << "无法打开文件进行追加操作。";
@@ -220,5 +226,60 @@ int FileOperation::getLastmodifiedTimeFileNumSubDir(const QString &path,const QS
     QStringList nameArr = lastModefyFile.split("-");
     num = nameArr.at(0).toInt();
     return num;
+}
+
+bool FileOperation::createMarkdownFile(const QString& FullPath, QString& currentFileName){
+    QDir dir(FullPath);
+    QFileInfoList list = dir.entryInfoList(QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot);
+    int max = -1;
+    QString templateFileName;
+    for(int i = 0; i < list.size(); ++i){
+        if(isMarkdownFile(list.at(i).fileName())){
+            QStringList nameArr = list.at(i).fileName().split("-");
+            int num = nameArr.at(0).toInt();
+            if(num > max){
+                max = num;
+            }
+            if(num == 0 && list.at(i).fileName().right(5) != "um.md"){
+                templateFileName =list.at(i).fileName();
+            }
+        }
+    }
+    int num = max+1;
+    QString fileName = QString("%1").arg(num, 2, 10, QLatin1Char('0')) + "-新建文件.md";
+    QString path =FullPath + "/" + fileName;
+
+    if(!templateFileName.isEmpty()){
+        QString templateFile = FullPath + "/" + templateFileName;
+        if(!QFile::copy(templateFile, path))
+        {
+            emit sigFileOperationLog(templateFile + QString(" copy failed!"));
+        }
+        emit sigFileOperationLog(QString("Copy: "+templateFile+"\nTo Create:"+ path + "\nCreate File Success  !!!"));
+        // 将拷贝的文件追加回车，成为最近修改文件
+        QFile file(path);
+        file.open(QIODevice::ReadWrite | QIODevice::Append);
+        QTextStream txtOutput(&file);
+        txtOutput << "\n";
+        file.close();
+        currentFileName = fileName;
+    }else{
+        QFile file(path);
+        if (file.exists()) {
+            emit sigFileOperationLog(QString("新建文件已存在！"));
+            return false;
+        }
+        file.open(QIODevice::WriteOnly);
+        QString text =  "# [新建文件](./)    \n" \
+                        "\n" \
+                        "> ######  _标签:_   ![](https://img.shields.io/badge/英语类-yellowgreen.svg)   ![](https://img.shields.io/badge/IELTS-雅思考试-blue.svg)   [![](https://img.shields.io/badge/链接-有道词典-brightgreen.svg)](https://dict.youdao.com/?keyfrom=cidian)   [![](https://img.shields.io/badge/链接-Cambridge-orange.svg)](https://dictionary.cambridge.org/)   \n"   \
+                        ">  \n\n\n";
+        QByteArray str = text.toUtf8();
+        file.write(str);
+        emit sigFileOperationLog(QString("Create File") + path + "\nCreate File Success");
+        currentFileName = fileName;
+        file.close();
+    }
+    return true;
 }
 

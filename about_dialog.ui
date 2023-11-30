@@ -51,7 +51,7 @@
              </size>
             </property>
             <property name="text">
-             <string>markdown助手：</string>
+             <string>word助手：</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>

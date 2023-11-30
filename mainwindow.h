@@ -5,6 +5,7 @@
 #include <QListWidgetItem>
 #include <QTextStream>
 #include <QLabel>
+#include <QTimer>
 #include "win_event_filter.h"
 #include "file_operation.h"
 #include "network_access.h"
@@ -25,6 +26,7 @@ public:
     void setWindowStyle();
     bool getConfPath(QString& iniPath, QString& confDirPath);
     void initConfInfo();
+    void initAddListMenu();
     void initWordSentList();
     void initStatusBar();
     void updateListWgt();
@@ -38,12 +40,18 @@ public:
     void whoIsBoxSelection(BoxSelect select);
     void changNumStyle(bool flags);
     void changSubPathStyle(bool flags);
+    void changRepoComStyle(bool flags);
     bool addWordSent2List(WordSentInfo wordInfo);
+    void updateAddListWgt();
+    void delWordListDataByName(QString name);
+
+    void setSampleView();
+
+    void setNormalView();
+    void setSampleViewByScreenRes();
 
 public slots:
     void getWordsSlot(WordsType status, QString words);
-    void appendWordInfoSlot(WordSentInfo wordInfo);
-    void appendSentenceInfoSlot(WordSentInfo wordInfo);
     void initActions();
     void appendTextToLog(QString log);
     void addWordListSlot(WordSentInfo wordInfo);
@@ -51,15 +59,28 @@ public slots:
     void addSentenceListSlot(WordSentInfo Sentence);
     void setRepoPathSlot(QString currentStr);
     void setSubPathSlot(QString currentStr);
-    void on_numSpinBox_valueChanged(int num);
-
+    void numSpinBoxValueChangedSlot(int num);
+    void changeSelectSatusSlot();
+    void moveDelItemFromListSlot(const QModelIndex &index);
+    void delItemFromAddListSlot();
     void setStatusBar(QString msg, bool isCorrect);
+
+    void modifyIniFileSlot();
+    void modifyConfSlot();
+    void clearTabWgtSlot();
+
+    void start();
+
+    void simpleViewSlot();
+
+    void syncAddTimelySlot();
+
 private slots:
     void on_toolButton_clicked();
-
     void on_openFilePbn_clicked();
-
     void on_addWordSentPbn_clicked();
+    void on_createMarkdownPbn_clicked();
+    void on_syncPbn_clicked();
 
 private:
     int screenWidth_;
@@ -81,9 +102,15 @@ private:
 
     BoxSelect boxSelect_;
 
+    bool isStayTop_{false};
+    int simpleViewNum_{0};
+
 
     QLabel* pStatusLabelIcon_;
     QLabel* pStatusLabelMsg_;
     QLabel* pStatusLabelCurrentFile_;
+
+    QTimer *timerSync_;
+    bool isSyncStart_{false};
 };
 #endif // MAINWINDOW_H

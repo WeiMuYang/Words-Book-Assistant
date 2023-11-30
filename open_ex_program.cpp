@@ -55,3 +55,5 @@ void OpenExProgram::OpenDirSlot(QString dirName)
     dirName = QString("file:") +dirName;
     QDesktopServices::openUrl(QUrl(dirName, QUrl::TolerantMode));
 }
+
+

@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>674</width>
+    <width>675</width>
     <height>688</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="minimumSize">
    <size>
@@ -28,10 +34,10 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>Markdown Assistant</string>
+   <string>Word Assistant</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QVBoxLayout" name="verticalLayout_8">
+   <layout class="QVBoxLayout" name="verticalLayout_8" stretch="2,1">
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout" stretch="3,7">
       <item>
@@ -59,7 +65,7 @@
         </property>
         <layout class="QVBoxLayout" name="listLayout" stretch="0,5">
          <property name="topMargin">
-          <number>10</number>
+          <number>15</number>
          </property>
          <item>
           <widget class="QWidget" name="listPbnWgt" native="true">
@@ -108,7 +114,32 @@
               <property name="minimumSize">
                <size>
                 <width>0</width>
-                <height>35</height>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>自动</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="inputPbn">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>40</height>
                </size>
               </property>
               <property name="maximumSize">
@@ -489,7 +520,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>674</width>
+     <width>675</width>
      <height>21</height>
     </rect>
    </property>
@@ -499,21 +530,19 @@
     </property>
     <addaction name="actionModifySysFile"/>
     <addaction name="actionModifyConf"/>
-    <addaction name="actionAddConfFile"/>
+    <addaction name="actionOpenRepo"/>
+    <addaction name="actionCreateBook"/>
+    <addaction name="actionOpenBook"/>
     <addaction name="actionRestart"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
      <string>编辑</string>
     </property>
+    <addaction name="actionAddWord"/>
     <addaction name="actionClearLog"/>
-    <addaction name="actionSubDirHistoryFile"/>
-    <addaction name="actionGetAssets"/>
-    <addaction name="actionRename"/>
-    <addaction name="actionCopyHistoryFilePath"/>
-    <addaction name="actionGetRelativePathOfMeetFile"/>
-    <addaction name="actionDelFromSrcList"/>
-    <addaction name="actionOpenREADME"/>
+    <addaction name="actionAutoSync"/>
+    <addaction name="actionDelListItem"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -539,11 +568,6 @@
     <string>重启</string>
    </property>
   </action>
-  <action name="actionGetAssets">
-   <property name="text">
-    <string>获取资源</string>
-   </property>
-  </action>
   <action name="actionAbout">
    <property name="text">
     <string>关于</string>
@@ -551,15 +575,10 @@
   </action>
   <action name="actionClearLog">
    <property name="text">
-    <string>刷新日志/历史文件</string>
+    <string>刷新日志</string>
    </property>
    <property name="toolTip">
     <string>清空日志/历史文件</string>
-   </property>
-  </action>
-  <action name="actionRename">
-   <property name="text">
-    <string>重命名</string>
    </property>
   </action>
   <action name="actionSimpleView">
@@ -567,57 +586,49 @@
     <string>极简窗口</string>
    </property>
   </action>
-  <action name="actionSysFile">
-   <property name="text">
-    <string>打开系统文件</string>
-   </property>
-  </action>
-  <action name="actionAddConfFile">
-   <property name="text">
-    <string>添加配置文件</string>
-   </property>
-  </action>
   <action name="actionModifyConf">
    <property name="text">
-    <string>修改当前配置</string>
+    <string>用户配置</string>
    </property>
   </action>
   <action name="actionModifySysFile">
    <property name="text">
-    <string>修改系统文件</string>
-   </property>
-  </action>
-  <action name="actionCopyHistoryFilePath">
-   <property name="text">
-    <string>获取相对路径</string>
-   </property>
-  </action>
-  <action name="actionSubDirHistoryFile">
-   <property name="text">
-    <string>刷新子目录文件</string>
-   </property>
-   <property name="toolTip">
-    <string>刷新子目录历史文件列表</string>
-   </property>
-  </action>
-  <action name="actionGetRelativePathOfMeetFile">
-   <property name="text">
-    <string>会议获取相对路径</string>
-   </property>
-  </action>
-  <action name="actionOpenREADME">
-   <property name="text">
-    <string>打开README</string>
-   </property>
-  </action>
-  <action name="actionDelFromSrcList">
-   <property name="text">
-    <string>删除资源文件</string>
+    <string>系统文件</string>
    </property>
   </action>
   <action name="actionStayTop">
    <property name="text">
     <string>最上面显示</string>
+   </property>
+  </action>
+  <action name="actionDelListItem">
+   <property name="text">
+    <string>删除</string>
+   </property>
+  </action>
+  <action name="actionAutoSync">
+   <property name="text">
+    <string>自动同步</string>
+   </property>
+  </action>
+  <action name="actionOpenBook">
+   <property name="text">
+    <string>打开单词本</string>
+   </property>
+  </action>
+  <action name="actionOpenRepo">
+   <property name="text">
+    <string>打开仓库</string>
+   </property>
+  </action>
+  <action name="actionCreateBook">
+   <property name="text">
+    <string>创建单词本</string>
+   </property>
+  </action>
+  <action name="actionAddWord">
+   <property name="text">
+    <string>添加单词</string>
    </property>
   </action>
  </widget>

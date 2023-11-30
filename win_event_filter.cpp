@@ -20,9 +20,8 @@ WinEventFilter::WinEventFilter(QObject * parent) : QObject(parent) {
 
 void WinEventFilter::setSymbols(QString p)
 {
-    qDebug() << p;
-//    symbols_.clear();
-//    symbols_ = p;
+    symbols_.clear();
+    symbols_ = p;
 }
 
 bool WinEventFilter::nativeEventFilter(const QByteArray &eventType, void *message, long *result){

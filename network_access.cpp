@@ -72,6 +72,7 @@ void NetworkAccess::analysisWordInfo(const QByteArray& Data) {
     QStringList listStr = dataStr.split(wordSplit);
     // 当前单词信息
     WordSentInfo curWordInfo;
+    curWordInfo.m_isWord = true;
     if(listStr.size() > 1){
         curWordInfo.m_WordSent = wordSentence_;
         curWordInfo.m_Phonetic_UK = getWordPhonetic(listStr.first());
@@ -103,6 +104,7 @@ void NetworkAccess::analysisSentenceInfo(const QByteArray& Data) {
     // 当前单词信息
     if(!dataStr.isEmpty()){
         WordSentInfo curWordInfo;
+        curWordInfo.m_isWord = false;
         curWordInfo.m_WordSent = wordSentence_;
         curWordInfo.m_Translation.append(dataStr);
         emit sendSentenceInfo(curWordInfo);

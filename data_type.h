@@ -5,6 +5,7 @@
 #include <QVector>
 
 struct WordSentInfo {
+    bool m_isWord;
     QString m_WordSent;
     QString m_Phonetic_UK;
     QStringList m_Translation; // n. 名词
@@ -41,7 +42,7 @@ typedef enum {
 }ScreenRes;
 
 typedef enum {
-    None, SubCombox, NumSpinBox
+    None, RepoCombox ,SubCombox, NumSpinBox
 }BoxSelect;
 
 

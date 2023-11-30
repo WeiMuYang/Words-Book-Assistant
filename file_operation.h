@@ -16,17 +16,17 @@ public:
     QStringList getSubDirNames(QString TarPath);
     bool getFileNameByNum(QString fullPath, int fileNum, QString& fileName);
     int getLastmodifiedTimeFileNumSubDir(const QString &path,const QString &dirName,QString& lastModefyFile);
+    bool createMarkdownFile(const QString& FullPath, QString& currentFileName);
 
 
 public slots:
-    bool appendWord(WordSentInfo wordInfo);
-    bool appendSentence(WordSentInfo sentence);
+    bool appendWord(const QString& path,WordSentInfo wordInfo);
+    bool appendSentence(const QString& path, WordSentInfo sentence);
 
 signals:
     void sigFileOperationLog(QString m);
 
 private:
-    QString wordPath_;
     QString cambridgeWordWeb_;
     QString cambridgeSentWeb_;
     QString pronunciationWeb_;
