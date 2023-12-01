@@ -26,6 +26,7 @@ public slots:
     bool getWords(WordsType& w);
 signals:
     void sendWords(WordsType status, QString words);
+    void sigWinEvenFilterLog(QString msg);
 
 private:
     QString clipText_;

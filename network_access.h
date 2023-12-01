@@ -27,6 +27,7 @@ public slots:
 signals:
     void sendWordInfo(WordSentInfo info);
     void sendSentenceInfo(WordSentInfo info);
+    void sigNetworkAccessLog(QString msg);
 private:
     QNetworkAccessManager *manager_;
     // 创建一个 GET 请求

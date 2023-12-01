@@ -57,6 +57,12 @@ MainWindow::MainWindow(QWidget *parent,QApplication* app)
     connect(timerSync_, &QTimer::timeout, this, &MainWindow::syncAddTimelySlot);
     timerSync_->setInterval(1500);
 
+    // log
+    connect(netWorkAccess_,&NetworkAccess::sigNetworkAccessLog,this, &MainWindow::appendTextToLog);
+    connect(openExPro_,&OpenExProgram::sigOpenExProLog,this, &MainWindow::appendTextToLog);
+    connect(winEventFilter_,&WinEventFilter::sigWinEvenFilterLog,this, &MainWindow::appendTextToLog);
+    connect(operateFile_,&FileOperation::sigFileOperationLog,this, &MainWindow::appendTextToLog);
+
     start();
 }
 
@@ -136,7 +142,6 @@ void MainWindow::initActions() {
     ui->actionAutoSync->setShortcut(QKeySequence("Ctrl+T"));
     connect(ui->actionAutoSync, &QAction::triggered, this, &MainWindow::on_syncPbn_clicked);
 
-
     // actionOpenBook
     ui->actionOpenBook->setShortcut(QKeySequence("Ctrl+O"));
     connect(ui->actionOpenBook, &QAction::triggered, this, &MainWindow::on_openFilePbn_clicked);
@@ -180,6 +185,15 @@ void MainWindow::updateListWgt()
     }
 }
 
+bool MainWindow::isWord(QString text){
+    for(int i = 0; i < text.length(); i++){
+        if(!text[i].isLower() && !text[i].isUpper()) {
+            return false;
+        }
+    }
+    return true;
+}
+
 void MainWindow::getWordsSlot(WordsType status, QString words)
 {
     switch (status) {
@@ -187,7 +201,20 @@ void MainWindow::getWordsSlot(WordsType status, QString words)
         netWorkAccess_->accessWord(words);
         break;
     case IsSentence:
-        netWorkAccess_->accessSentence(words);
+    {
+        QStringList list = words.split("\n");
+        if(list.size() <= 1){
+            netWorkAccess_->accessSentence(words);
+        }else{
+            for(int i = 0; i < list.size(); ++i){
+                if(isWord(list.at(i))) {
+                    netWorkAccess_->accessWord(list.at(i));
+                }else{
+                    netWorkAccess_->accessSentence(list.at(i));
+                }
+            }
+        }
+    }
         break;
     default:
         break;
@@ -417,12 +444,12 @@ void MainWindow::setSubPathSlot(QString currentStr)
         setStatusBar("", false);
         whoIsBoxSelection(BoxSelect::SubCombox);
     }else{
-
+        currentWordCount_ = operateFile_->getCurrentFileWordNum(repoPath + "/" + subDirName_ + "/" + currentFile_);
         disconnect(ui->numSpinBox,QOverload<int>::of(&QSpinBox::valueChanged),this,&MainWindow::numSpinBoxValueChangedSlot);
         ui->numSpinBox->setValue(num);
-        setStatusBar("", true);
         connect(ui->numSpinBox,QOverload<int>::of(&QSpinBox::valueChanged),this,&MainWindow::numSpinBoxValueChangedSlot);
         emit ui->numSpinBox->valueChanged(num);
+        setStatusBar("", true);
     }
 }
 
@@ -434,12 +461,14 @@ void MainWindow::whoIsBoxSelection(BoxSelect select)
         changRepoComStyle(true);
         changSubPathStyle(false);
         changNumStyle(false);
+        currentWordCount_ = -1;
         break;
 
     case BoxSelect::SubCombox:
         changSubPathStyle(true);
         changNumStyle(false);
         changRepoComStyle(false);
+        currentWordCount_ = -1;
         break;
     case BoxSelect::NumSpinBox:
         changSubPathStyle(false);
@@ -450,6 +479,7 @@ void MainWindow::whoIsBoxSelection(BoxSelect select)
         changSubPathStyle(false);
         changNumStyle(false);
         changRepoComStyle(false);
+        currentWordCount_ = -1;
         break;
     }
 }
@@ -492,15 +522,17 @@ void MainWindow::numSpinBoxValueChangedSlot(int num)
     if(operateFile_->getFileNameByNum(repoPath+"/" + subDirName_, num, currentFile_)){
         if(currentFile_.size() > 3 && currentFile_.right(2) == "md"){
             appendTextToLog(u8"当前文档为：" + currentFile_);
+            currentWordCount_ = operateFile_->getCurrentFileWordNum(repoPath + "/" + subDirName_ + "/" + currentFile_);
         }else{
             appendTextToLog(u8"当前目录为：" + currentFile_);
+            currentWordCount_ = -1;
         }
-        setStatusBar("",true);
         whoIsBoxSelection(BoxSelect::NumSpinBox);
+        setStatusBar("",true);
     }else{
-        setStatusBar("",false);
         currentFile_.clear();
         whoIsBoxSelection(BoxSelect::SubCombox);
+        setStatusBar("",false);
 
     }
 }
@@ -513,17 +545,15 @@ void MainWindow::setStatusBar(QString msg, bool isCorrect){
         pStatusLabelIcon_->setMinimumWidth(15);
         pStatusLabelMsg_->setText(u8"正常");
         pStatusLabelCurrentFile_->setText("|  " +subDirName_ +"/"+ currentFile_);
+        pStatusLabelWordCount_->setText(QString::number( currentWordCount_) + "个");
     }else{
         QImage image(QString(":/qss/psblack/checkbox_checked_disable.png"));
         pStatusLabelIcon_->setPixmap(QPixmap::fromImage(image));
         pStatusLabelIcon_->setMinimumWidth(15);
         pStatusLabelMsg_->setText(u8"错误");
         pStatusLabelCurrentFile_->setText("|  " + currentFile_);
+        pStatusLabelWordCount_->setText("");
     }
-
-    ui->statusBar->addWidget(pStatusLabelIcon_);
-    ui->statusBar->addWidget(pStatusLabelMsg_);
-    ui->statusBar->addWidget(pStatusLabelCurrentFile_);
 }
 
 void MainWindow::initStatusBar(){
@@ -532,6 +562,15 @@ void MainWindow::initStatusBar(){
     pStatusLabelMsg_->setAlignment(Qt::AlignLeft);
     pStatusLabelCurrentFile_ = new QLabel("",this);
     pStatusLabelCurrentFile_->setAlignment(Qt::AlignHCenter);
+
+    pStatusLabelWordCount_ = new QLabel("",this);
+    pStatusLabelWordCount_->setAlignment(Qt::AlignHCenter);
+
+
+    ui->statusBar->addWidget(pStatusLabelIcon_);
+    ui->statusBar->addWidget(pStatusLabelMsg_);
+    ui->statusBar->addWidget(pStatusLabelCurrentFile_);
+    ui->statusBar->addPermanentWidget(pStatusLabelWordCount_);
 }
 
 void MainWindow::on_toolButton_clicked()
@@ -559,15 +598,19 @@ void MainWindow::on_addWordSentPbn_clicked()
                 WordSentInfo wordSent = wordSentList_.at(j);
                 if(wordSent.m_isWord) {
                     if(operateFile_->appendWord(currentFile, wordSent)) {
-                        appendTextToLog("Append " + wordSent.m_WordSent + " succeed!");
+                        appendTextToLog("添加 [" + wordSent.m_WordSent + "] 成功!");
+                        currentWordCount_++;
+                        pStatusLabelWordCount_->setText(QString::number( currentWordCount_) + "个");
                     }else{
-                        appendTextToLog("Append " + wordSent.m_WordSent + " fauiled!");
+                        appendTextToLog("添加 [" + wordSent.m_WordSent + "] 失败!");
                     }
                 } else {
                     if(operateFile_->appendSentence(currentFile, wordSent)) {
-                        appendTextToLog("Append " + wordSent.m_WordSent + " succeed!");
+                        currentWordCount_++;
+                        pStatusLabelWordCount_->setText(QString::number( currentWordCount_) + "个");
+                        appendTextToLog("添加 [" + wordSent.m_WordSent + "] 成功!");
                     }else{
-                        appendTextToLog("Append " + wordSent.m_WordSent + " fauiled!");
+                        appendTextToLog("添加 [" + wordSent.m_WordSent + "] 失败!");
                     }
                 }
                 break;

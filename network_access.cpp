@@ -7,7 +7,6 @@
 
 const QString wordSplit = "<span class=\"pos\"";
 const QString phonetic = ">英</span><span class=\"phonetic\"";
-//const QString wordSubStringEnd = " class=\"pos\">";
 
 NetworkAccess::NetworkAccess(QObject *parent)
     : QObject{parent}
@@ -22,10 +21,7 @@ void NetworkAccess::accessWord(QString word){
     QString web = translateWeb_;
     web = web.replace("%word%" ,word);
     request_.setUrl(QUrl(web));
-    //    request_.setUrl(QUrl(u8"https://dict.youdao.com/result?word=" + word + "&lang=en"));
-    // 发送请求并获取响应
     reply_ = manager_->get(request_);
-    // 当请求完成时，响应数据可用
     QObject::connect(reply_, &QNetworkReply::finished, this, &NetworkAccess::replyWordFinishedSlot);
 }
 
@@ -35,10 +31,10 @@ void NetworkAccess::replyWordFinishedSlot(){
         QByteArray data = reply_->readAll();
         // 处理响应数据，例如保存为音频文件或进行播放
         analysisWordInfo(data);
-        qDebug() << "Speech data received successfully.";
+        emit sigNetworkAccessLog("接收单词数据成功!");
     }else{
         // 处理请求错误
-        qDebug() << "Error occurred: " << reply_->errorString();
+        emit sigNetworkAccessLog("接收单词数据失败: " + reply_->errorString());
     }
 
     // 释放资源
@@ -77,22 +73,21 @@ void NetworkAccess::analysisWordInfo(const QByteArray& Data) {
         curWordInfo.m_WordSent = wordSentence_;
         curWordInfo.m_Phonetic_UK = getWordPhonetic(listStr.first());
         for(int i = 1; i < listStr.size()-1; ++i) {
-            qDebug() << listStr.at(i);
+//            qDebug() << listStr.at(i);
             curWordInfo.m_Translation.append(delWordExCharacters(listStr.at(i)));
         }
         int pos = listStr.last().indexOf("</li>");
         curWordInfo.m_Translation.append(delWordExCharacters(listStr.last().remove(pos+5, listStr.last().size())));
-        qDebug() << curWordInfo.m_Phonetic_UK;
-        qDebug() << curWordInfo.m_Translation;
+//        qDebug() << curWordInfo.m_Phonetic_UK;
+//        qDebug() << curWordInfo.m_Translation;
         emit sendWordInfo(curWordInfo);
     }
     else{
-        qDebug() << "分割HTML字符串出错！";
+        emit sigNetworkAccessLog("分割HTML字符串出错！");
     }
 }
 
 // Sentence
-
 void NetworkAccess::analysisSentenceInfo(const QByteArray& Data) {
     QString dataStr = QString(Data);
     int pos = dataStr.indexOf("trans-content");
@@ -110,7 +105,7 @@ void NetworkAccess::analysisSentenceInfo(const QByteArray& Data) {
         emit sendSentenceInfo(curWordInfo);
     }
     else{
-        qDebug() << "分割HTML字符串出错！";
+        emit sigNetworkAccessLog("分割HTML字符串出错！");
     }
 }
 
@@ -121,12 +116,11 @@ void NetworkAccess::replySentenceFinishedSlot()
         QByteArray data = reply_->readAll();
         // 处理响应数据，例如保存为音频文件或进行播放
         analysisSentenceInfo(data);
-        qDebug() << "Speech data received successfully.";
+        emit sigNetworkAccessLog("接收单词数据成功!");
     }else{
         // 处理请求错误
-        qDebug() << "Error occurred: " << reply_->errorString();
+        emit sigNetworkAccessLog("接收单词数据失败: " + reply_->errorString());
     }
-
     // 释放资源
     reply_->deleteLater();
 }
@@ -137,7 +131,6 @@ void NetworkAccess::accessSentence(QString sentence){
     QString web = translateWeb_;
     web = web.replace("%word%" ,encodedString);
     request_.setUrl(QUrl(web));
-    //    request_.setUrl(QUrl(u8"https://dict.youdao.com/result?word=" + encodedString + "&lang=en"));
     // 发送请求并获取响应
     reply_ = manager_->get(request_);
     // 当请求完成时，响应数据可用

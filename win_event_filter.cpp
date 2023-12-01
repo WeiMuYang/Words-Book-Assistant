@@ -15,7 +15,7 @@ WinEventFilter::WinEventFilter(QObject * parent) : QObject(parent) {
     for (char c = 'A'; c <= 'Z'; ++c) {
         letters_.append(c);
     }
-    symbols_ = QString::fromUtf8(" !\"'()*,-.:;<>?[]_|~");
+    symbols_ = QString::fromUtf8(" !\"'()*,-.:;<>?[]_|~\n");
 }
 
 void WinEventFilter::setSymbols(QString p)

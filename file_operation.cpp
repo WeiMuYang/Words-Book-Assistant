@@ -27,7 +27,7 @@ bool FileOperation::readIniFile(QString iniPath, IniInfo &iniInfo)
 {
     QFile file(iniPath);
     if(!file.open(QIODevice::ReadOnly)){
-        qDebug() << "read ini json error";
+        emit sigFileOperationLog("Read ini json error.");
         return false;
     }
     QByteArray data(file.readAll());
@@ -38,7 +38,7 @@ bool FileOperation::readIniFile(QString iniPath, IniInfo &iniInfo)
     QJsonDocument jDoc = QJsonDocument::fromJson(data, &jError);
     //判断QJsonParseError对象获取的error是否包含错误，包含则返回0
     if(jError.error != QJsonParseError::NoError){
-        qDebug()<<"json format error";
+        emit sigFileOperationLog("Json format error");
         return false;
     }
     QJsonObject rootObj = jDoc.object();
@@ -59,7 +59,7 @@ bool FileOperation::readUserFile(QString usrPath, UserInfo &userInfo)
 {
     QFile file(usrPath);
     if(!file.open(QIODevice::ReadOnly)){
-        qDebug() << "read usr json error";
+        emit sigFileOperationLog("Read usr json error");
         return false;
     }
     QByteArray data(file.readAll());
@@ -70,7 +70,7 @@ bool FileOperation::readUserFile(QString usrPath, UserInfo &userInfo)
     QJsonDocument jDoc = QJsonDocument::fromJson(data, &jError);
     //判断QJsonParseError对象获取的error是否包含错误，包含则返回0
     if(jError.error != QJsonParseError::NoError){
-        qDebug() << "json format error";
+        emit sigFileOperationLog("Json format error");
         return false;
     }
     QJsonObject jObj = jDoc.object();
@@ -127,14 +127,11 @@ bool FileOperation::appendWord(const QString& path, WordSentInfo wordInfo){
     QFile file(path);
     if (!file.open(QIODevice::Append | QIODevice::Text))
     {
-        qDebug() << "无法打开文件进行追加操作。";
+        emit sigFileOperationLog("无法打开文件进行添加操作!");
         return false;
     }
     QTextStream stream(&file);
-//    stream << "\n<p><a href=https://dictionary.cambridge.org/dictionary/english-chinese-simplified/"
-//           << wordInfo.m_WordSent << ">" << wordInfo.m_WordSent << "</a> &nbsp; &nbsp;/" << wordInfo.m_Phonetic_UK
-//           << "/ &nbsp; &nbsp; <audio src=http://dict.youdao.com/dictvoice?type=0&audio=" << wordInfo.m_WordSent
-//           << " style=\"width:101px; height: 12px\"></audio> </p> \n";
+
     stream << "\n<p><a href=" << cambridgeWordWeb_
            << wordInfo.m_WordSent << ">" << wordInfo.m_WordSent << "</a> &nbsp; &nbsp;/" << wordInfo.m_Phonetic_UK
            << "/ &nbsp; &nbsp; <audio src=" << pronunciationWeb_ << wordInfo.m_WordSent
@@ -145,7 +142,7 @@ bool FileOperation::appendWord(const QString& path, WordSentInfo wordInfo){
     }
 
     file.close();
-    qDebug() << "文本已成功追加到文件中。";
+//    emit sigFileOperationLog("单词已成功添加到文件中!");
     return true;
 }
 
@@ -153,22 +150,19 @@ bool FileOperation::appendSentence(const QString& path,WordSentInfo sentence){
     QFile file(path);
     if (!file.open(QIODevice::Append | QIODevice::Text))
     {
-        qDebug() << "无法打开文件进行追加操作。";
+        emit sigFileOperationLog("无法打开文件进行添加操作。");
         return false;
     }
     QTextStream stream(&file);
     QString replaceSpaceSent = sentence.m_WordSent;
     replaceSpaceSent = replaceSpaceSent.replace(" ","+");
 
-//    stream <<"\n<p><a href=https://dictionary.cambridge.org/spellcheck/english-chinese-simplified/?q=" << cambridge
-//           << ">" << sentence.m_WordSent << "</a> &nbsp; &nbsp;  &nbsp; &nbsp; <audio src=http://dict.youdao.com/dictvoice?type=0&audio="
-//           << QUrl::toPercentEncoding(sentence.m_WordSent) << " style=\"width:101px; height: 12px\"></audio> </p> \n";
     stream <<"\n<p><a href=" << cambridgeSentWeb_ << replaceSpaceSent
            << ">" << sentence.m_WordSent << "</a> &nbsp; &nbsp;  &nbsp; &nbsp; <audio src=" << pronunciationWeb_
            << QUrl::toPercentEncoding(sentence.m_WordSent) << " style=\"width:101px; height: 12px\"></audio> </p> \n";
     stream <<"- "<< sentence.m_Translation.first() << "\n";
     file.close();
-    qDebug() << "文本已成功追加到文件中。";
+//    emit sigFileOperationLog("句子已成功追加到文件中!");
     return true;
 }
 
@@ -281,5 +275,24 @@ bool FileOperation::createMarkdownFile(const QString& FullPath, QString& current
         file.close();
     }
     return true;
+}
+
+int FileOperation::getCurrentFileWordNum(const QString &path)
+{
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        qDebug() << "Failed to open file";
+        return -1;
+    }
+
+    // 读取文件内容并统计字符串个数
+    QTextStream in(&file);
+    QString content = in.readAll();
+    int count = content.count("http://dict.youdao.com");
+
+    // 关闭文件
+    file.close();
+    return count;
 }
 

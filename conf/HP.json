@@ -20,6 +20,6 @@
         "PronunciationWeb": "http://dict.youdao.com/dictvoice?type=0&audio=",
         "TranslateWeb": "https://dict.youdao.com/result?word=%word%&lang=en"
     },
-    "?Symbols": " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~",
-    "Symbols": " ,-.:;[]_"
+    "?Symbols": " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~\n",
+    "Symbols": " ,-.:;[]_\n"
 }

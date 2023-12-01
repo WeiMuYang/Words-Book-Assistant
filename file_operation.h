@@ -17,6 +17,7 @@ public:
     bool getFileNameByNum(QString fullPath, int fileNum, QString& fileName);
     int getLastmodifiedTimeFileNumSubDir(const QString &path,const QString &dirName,QString& lastModefyFile);
     bool createMarkdownFile(const QString& FullPath, QString& currentFileName);
+    int getCurrentFileWordNum(const QString& path);
 
 
 public slots:

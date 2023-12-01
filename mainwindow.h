@@ -49,7 +49,7 @@ public:
 
     void setNormalView();
     void setSampleViewByScreenRes();
-
+    bool isWord(QString text);
 public slots:
     void getWordsSlot(WordsType status, QString words);
     void initActions();
@@ -98,6 +98,7 @@ private:
     QString repoPathName_;
     QString subDirName_;
     QString currentFile_;
+    int currentWordCount_;
 
 
     BoxSelect boxSelect_;
@@ -109,8 +110,10 @@ private:
     QLabel* pStatusLabelIcon_;
     QLabel* pStatusLabelMsg_;
     QLabel* pStatusLabelCurrentFile_;
+    QLabel* pStatusLabelWordCount_;
 
     QTimer *timerSync_;
     bool isSyncStart_{false};
+
 };
 #endif // MAINWINDOW_H
