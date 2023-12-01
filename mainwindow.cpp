@@ -4,6 +4,7 @@
 #include <QFile>
 #include <QDir>
 #include <QDesktopWidget>
+#include "thread_request.h"
 #include "data_type.h"
 
 int printscreeninfo()
@@ -75,9 +76,9 @@ void MainWindow::start(){
     winEventFilter_->setSymbols(userInfo_.m_Symbols);
     connect(winEventFilter_,&WinEventFilter::sendWords,this, &MainWindow::getWordsSlot);
     // network
-    netWorkAccess_->setTranslateWeb(userInfo_.m_TranslateWeb);
-    connect(netWorkAccess_,&NetworkAccess::sendWordInfo,this, &MainWindow::addWordListSlot);
-    connect(netWorkAccess_,&NetworkAccess::sendSentenceInfo,this, &MainWindow::addSentenceListSlot);
+//    netWorkAccess_->setTranslateWeb(userInfo_.m_TranslateWeb);
+//    connect(netWorkAccess_,&NetworkAccess::sendWordInfo,this, &MainWindow::addWordListSlot);
+//    connect(netWorkAccess_,&NetworkAccess::sendSentenceInfo,this, &MainWindow::addSentenceListSlot);
     // repo combox
     initRepoAndFilePathCombox();
     // sub combox
@@ -196,30 +197,44 @@ bool MainWindow::isWord(QString text){
 
 void MainWindow::getWordsSlot(WordsType status, QString words)
 {
-    switch (status) {
-    case IsWord:
-        netWorkAccess_->accessWord(words);
-        break;
-    case IsSentence:
-    {
+
+    if(status == IsWord){
+        //        netWorkAccess_->accessWord(words);
+        Controller *contrlThr = new Controller;
+        contrlThr->operateWord(userInfo_.m_TranslateWeb, words);
+        connect(contrlThr,&Controller::sendSent,this, &MainWindow::addSentenceListSlot);
+        connect(contrlThr,&Controller::sendWord,this, &MainWindow::addWordListSlot);
+    }
+    else if(status == IsSentence) {
         QStringList list = words.split("\n");
         if(list.size() <= 1){
-            netWorkAccess_->accessSentence(words);
+            //            netWorkAccess_->accessSentence(words);
+            Controller *contrlThr = new Controller;
+            contrlThr->operateSent(userInfo_.m_TranslateWeb, words);
+            connect(contrlThr,&Controller::sendSent,this, &MainWindow::addSentenceListSlot);
+            connect(contrlThr,&Controller::sendWord,this, &MainWindow::addWordListSlot);
         }else{
             for(int i = 0; i < list.size(); ++i){
                 if(isWord(list.at(i))) {
-                    netWorkAccess_->accessWord(list.at(i));
+                    //                    netWorkAccess_->accessWord(list.at(i));
+                    Controller *contrlThr = new Controller;
+                    contrlThr->operateWord(userInfo_.m_TranslateWeb, list.at(i));
+                    connect(contrlThr,&Controller::sendSent,this, &MainWindow::addSentenceListSlot);
+                    connect(contrlThr,&Controller::sendWord,this, &MainWindow::addWordListSlot);
                 }else{
-                    netWorkAccess_->accessSentence(list.at(i));
+                    //                    netWorkAccess_->accessSentence(list.at(i));
+                    Controller *contrlThr = new Controller;
+                    contrlThr->operateSent(userInfo_.m_TranslateWeb, list.at(i));
+                    connect(contrlThr,&Controller::sendSent,this, &MainWindow::addSentenceListSlot);
+                    connect(contrlThr,&Controller::sendWord,this, &MainWindow::addWordListSlot);
                 }
             }
+
         }
     }
-        break;
-    default:
-        break;
-    }
+
 }
+
 
 bool MainWindow::addWordSent2List(WordSentInfo wordInfo){
     for(int i = 0; i < wordSentList_.size(); ++i) {

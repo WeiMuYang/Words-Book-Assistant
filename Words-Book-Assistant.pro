@@ -15,6 +15,7 @@ SOURCES += \
     mainwindow.cpp \
     network_access.cpp \
     open_ex_program.cpp \
+    thread_request.cpp \
     win_event_filter.cpp
 
 HEADERS += \
@@ -24,6 +25,7 @@ HEADERS += \
     mainwindow.h \
     network_access.h \
     open_ex_program.h \
+    thread_request.h \
     win_event_filter.h
 
 FORMS += \
