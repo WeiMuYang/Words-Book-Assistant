@@ -19,6 +19,6 @@
         <file>qss/psblack/radiobutton_checked_disable.png</file>
         <file>qss/psblack/radiobutton_unchecked.png</file>
         <file>qss/psblack/radiobutton_unchecked_disable.png</file>
-        <file>qss/icon/markdown-assistant.ico</file>
+        <file>qss/icon/word-assistant.ico</file>
     </qresource>
 </RCC>
