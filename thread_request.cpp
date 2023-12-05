@@ -11,6 +11,8 @@ Worker::Worker(QObject *parent) : QObject(parent)
     netWorkAccess_ = new NetworkAccess(this);
 
     qRegisterMetaType<WordSentInfo>("WordSentInfo");
+
+    connect(netWorkAccess_, &NetworkAccess::sigNetworkAccessLog, this, &Worker::getLogSlot);
 }
 
 
@@ -44,7 +46,7 @@ void Worker::doWorkAccessSent(const QString& TranslateWeb, QString sent)        
 {
     // network
     netWorkAccess_->setTranslateWeb(TranslateWeb);
-    netWorkAccess_->accessWord(sent);
+    netWorkAccess_->accessSentence(sent);
     connect(netWorkAccess_,&NetworkAccess::sendSentenceInfo,this, &Worker::addSentSlot);
 }
 
@@ -52,6 +54,11 @@ void Worker::doWorkAccessSent(const QString& TranslateWeb, QString sent)        
 void Worker::addSentSlot(WordSentInfo wordInfo){
     emit resultSentSend(wordInfo);    // 发送工作的结果
     emit endThrSend();             // 发送结束信号
+}
+
+void Worker::getLogSlot(QString msg)
+{
+    emit sigWorkerLog(msg);
 }
 
 ///////////////////////////////// control ///////////////////////////////
@@ -68,12 +75,14 @@ Controller::Controller(QObject *parent) : QObject(parent) {
     connect(m_pthr_doWork, SIGNAL(finished()), m_pthr_doWork, SLOT(deleteLater()));
     // 4. 收到操作信号，线程运行worker的doWork槽函数
     connect(this, &Controller::operateWord, m_worker_obj, &Worker::doWorkAccessWord);
-    connect(this, &Controller::operateSent, m_worker_obj, &Worker::doWorkAccessWord);
+    connect(this, &Controller::operateSent, m_worker_obj, &Worker::doWorkAccessSent);
     // 5. 收到worker的结果信号后，将结果发送给handleResults槽函数
     connect(m_worker_obj, &Worker::resultWordSend, this, &Controller::handleWordResults);
     connect(m_worker_obj, &Worker::resultSentSend, this, &Controller::handleSentResults);
     // 6. 收到worker的结束信号后，执行任务结束显示槽函数workEndDisplay
     connect(m_worker_obj, &Worker::endThrSend, this, &Controller::workEndDisplay);
+
+    connect(m_worker_obj, &Worker::sigWorkerLog, this,&Controller::getLogSlot);
     // 7. 启动线程
     m_pthr_doWork->start();
 }
@@ -113,4 +122,8 @@ void Controller::handleSentResults(WordSentInfo result)   //处理线程执行�
     qDebug()<<"Controller::handleResults thread ID:"<< QThread::currentThreadId()<<'\n';
     qDebug()<<"the last result is:"<<result.m_WordSent;
     sendSent(result);
+}
+
+void Controller::getLogSlot(QString msg){
+    emit sigControllerLog(msg);
 }

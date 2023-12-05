@@ -24,6 +24,7 @@ public slots:
     void addWordSlot(WordSentInfo wordInfo);
     void doWorkAccessSent(const QString& TranslateWeb, QString sent);
     void addSentSlot(WordSentInfo wordInfo);
+    void getLogSlot(QString msg);
 
 signals:
     // 3. 发送包含执行的结果的信号
@@ -31,6 +32,7 @@ signals:
     void resultSentSend(WordSentInfo result);
     // 4. 发送执行结束的信号
     void endThrSend();
+    void sigWorkerLog(QString msg);
 private:
     NetworkAccess* netWorkAccess_;
 };
@@ -52,12 +54,14 @@ public slots:
     // 2. 接收执行结果的槽函数
     void handleWordResults(WordSentInfo result);
     void handleSentResults(WordSentInfo result);
+    void getLogSlot(QString msg);
 signals:
     // 3. 发送启动doWork的信号
     void operateWord(const QString& TranslateWeb, QString word);
     void operateSent(const QString& TranslateWeb, QString word);
     void sendWord(WordSentInfo ws);
     void sendSent(WordSentInfo ws);
+    void sigControllerLog(QString msg);
 private:
     // 4. 子线程指针，指向运行doWork函数的线程对象
     QThread* m_pthr_doWork;
