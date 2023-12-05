@@ -50,11 +50,13 @@ public:
     void setNormalView();
     void setSampleViewByScreenRes();
     bool isWord(QString text);
+    bool appendWordSentList(QString s);
 public slots:
     void getWordsSlot(WordsType status, QString words);
     void initActions();
     void appendTextToLog(QString log);
     void addWordListSlot(WordSentInfo wordInfo);
+    void addWord2UiListSlot(QString wordInfo);
     void itemEnteredSlot(QListWidgetItem *item);
     void addSentenceListSlot(WordSentInfo Sentence);
     void setRepoPathSlot(QString currentStr);
@@ -92,7 +94,8 @@ private:
     OpenExProgram *openExPro_;
     IniInfo iniInfo_;
     UserInfo userInfo_;
-    QVector<WordSentInfo> wordSentList_;
+    QVector<WordSentInfo> wordSentListInfo_;
+    QStringList wordSentList_;
     int multiple_;
 
     QString repoPathName_;

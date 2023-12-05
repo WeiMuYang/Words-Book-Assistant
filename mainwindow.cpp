@@ -175,9 +175,9 @@ void MainWindow::updateListWgt()
 {
     ui->addList->clear();
 
-    for(int i = 0; i < wordSentList_.size(); ++i){
+    for(int i = 0; i < wordSentListInfo_.size(); ++i){
         QListWidgetItem *pItem = new QListWidgetItem;
-        QString data = wordSentList_.at(i).m_WordSent;
+        QString data = wordSentListInfo_.at(i).m_WordSent;
         pItem->setSizeHint(QSize(20,20 * multiple_));
         pItem->setText(data);
         pItem->setToolTip(data);
@@ -195,13 +195,23 @@ bool MainWindow::isWord(QString text){
     return true;
 }
 
+bool MainWindow::appendWordSentList(QString s) {
+    for (int i = 0; i < wordSentList_.size(); i++) {
+        if(wordSentList_.at(i) == s) {
+            return false;
+        }
+    }
+    wordSentList_.append(s);
+    addWord2UiListSlot(s);
+    return true;
+}
+
 void MainWindow::getWordsSlot(WordsType status, QString words)
 {
-
     if(status == IsWord){
-        //        netWorkAccess_->accessWord(words);
         Controller *contrlThr = new Controller;
         contrlThr->operateWord(userInfo_.m_TranslateWeb, words);
+        appendWordSentList(words);
         connect(contrlThr,&Controller::sendSent,this, &MainWindow::addSentenceListSlot);
         connect(contrlThr,&Controller::sendWord,this, &MainWindow::addWordListSlot);
     }
@@ -210,6 +220,7 @@ void MainWindow::getWordsSlot(WordsType status, QString words)
         if(list.size() <= 1){
             //            netWorkAccess_->accessSentence(words);
             Controller *contrlThr = new Controller;
+            appendWordSentList(words);
             contrlThr->operateSent(userInfo_.m_TranslateWeb, words);
             connect(contrlThr,&Controller::sendSent,this, &MainWindow::addSentenceListSlot);
             connect(contrlThr,&Controller::sendWord,this, &MainWindow::addWordListSlot);
@@ -218,12 +229,14 @@ void MainWindow::getWordsSlot(WordsType status, QString words)
                 if(isWord(list.at(i))) {
                     //                    netWorkAccess_->accessWord(list.at(i));
                     Controller *contrlThr = new Controller;
+                    appendWordSentList(list.at(i));
                     contrlThr->operateWord(userInfo_.m_TranslateWeb, list.at(i));
                     connect(contrlThr,&Controller::sendSent,this, &MainWindow::addSentenceListSlot);
                     connect(contrlThr,&Controller::sendWord,this, &MainWindow::addWordListSlot);
                 }else{
                     //                    netWorkAccess_->accessSentence(list.at(i));
                     Controller *contrlThr = new Controller;
+                    appendWordSentList(list.at(i));
                     contrlThr->operateSent(userInfo_.m_TranslateWeb, list.at(i));
                     connect(contrlThr,&Controller::sendSent,this, &MainWindow::addSentenceListSlot);
                     connect(contrlThr,&Controller::sendWord,this, &MainWindow::addWordListSlot);
@@ -232,34 +245,34 @@ void MainWindow::getWordsSlot(WordsType status, QString words)
 
         }
     }
-
 }
 
 
 bool MainWindow::addWordSent2List(WordSentInfo wordInfo){
-    for(int i = 0; i < wordSentList_.size(); ++i) {
-        if(wordSentList_.at(i).m_WordSent == wordInfo.m_WordSent){
+    for(int i = 0; i < wordSentListInfo_.size(); ++i) {
+        if(wordSentListInfo_.at(i).m_WordSent == wordInfo.m_WordSent){
             appendTextToLog(wordInfo.m_WordSent + u8" 已存在 !");
             return false;
         }
     }
-    wordSentList_.append(wordInfo);
+    wordSentListInfo_.append(wordInfo);
     return true;
 }
 
 void MainWindow::updateAddListWgt()
 {
     ui->addList->clear();
-//    wordSentList_
+//    wordSentListInfo_
     for(int i = 0; i < wordSentList_.size(); ++i){
-        addWordListSlot(wordSentList_.at(i));
+        addWord2UiListSlot(wordSentList_.at(i));
     }
 }
 
 void MainWindow::delWordListDataByName(QString name){
     for(int i = 0; i < wordSentList_.size(); ++i){
-        if(name == wordSentList_.at(i).m_WordSent) {
-            wordSentList_.remove(i);
+        if(name == wordSentList_.at(i)) {
+            wordSentList_.removeAt(i);
+//            wordSentList_.removeAt()
             break;
         }
     }
@@ -269,11 +282,20 @@ void MainWindow::addWordListSlot(WordSentInfo wordInfo){
     if(!addWordSent2List(wordInfo)) {
         return;
     }
+//    QListWidgetItem *pItem = new QListWidgetItem;
+//    QString data = wordInfo.m_WordSent;
+//    pItem->setSizeHint(QSize(20,20 * multiple_));
+//    pItem->setText(data);
+//    pItem->setToolTip(data);
+
+//    ui->addList->addItem(pItem);
+}
+
+void MainWindow::addWord2UiListSlot(QString wordInfo){
     QListWidgetItem *pItem = new QListWidgetItem;
-    QString data = wordInfo.m_WordSent;
     pItem->setSizeHint(QSize(20,20 * multiple_));
-    pItem->setText(data);
-    pItem->setToolTip(data);
+    pItem->setText(wordInfo);
+    pItem->setToolTip(wordInfo);
 
     ui->addList->addItem(pItem);
 }
@@ -282,13 +304,13 @@ void MainWindow::addWordListSlot(WordSentInfo wordInfo){
 void MainWindow::addSentenceListSlot(WordSentInfo Sentence) {
     if(!addWordSent2List(Sentence))
         return;
-    QListWidgetItem *pItem = new QListWidgetItem;
-    QString data = Sentence.m_WordSent;
-    pItem->setSizeHint(QSize(20,20 * multiple_));
-    pItem->setText(data);
-    pItem->setToolTip(data);
+//    QListWidgetItem *pItem = new QListWidgetItem;
+//    QString data = Sentence.m_WordSent;
+//    pItem->setSizeHint(QSize(20,20 * multiple_));
+//    pItem->setText(data);
+//    pItem->setToolTip(data);
 
-    ui->addList->addItem(pItem);
+//    ui->addList->addItem(pItem);
 }
 
 void MainWindow::setWindowStyle()
@@ -330,9 +352,11 @@ void MainWindow::itemEnteredSlot(QListWidgetItem *item)
 {
     QString name = item->text();
     WordSentInfo wordInfo;
-    for (int i = 0; i < wordSentList_.size(); ++i) {
-        if(wordSentList_.at(i).m_WordSent == name) {
-            wordInfo = wordSentList_.at(i);
+    bool isInListInfo = false;
+    for (int i = 0; i < wordSentListInfo_.size(); ++i) {
+        if(wordSentListInfo_.at(i).m_WordSent == name) {
+            isInListInfo = true;
+            wordInfo = wordSentListInfo_.at(i);
             ui->textEdit->clear();
             if(wordInfo.m_isWord) {
                 ui->textEdit->append("<font color=\"#00FFFF\">"
@@ -347,6 +371,12 @@ void MainWindow::itemEnteredSlot(QListWidgetItem *item)
             }
             break;
         }
+    }
+    if (!isInListInfo) {
+        ui->textEdit->clear();
+        ui->textEdit->append("<font color=\"#00FFFF\">"
+                             + name + "</font>");
+        ui->textEdit->append("<font color=\"#FF0000\"> - Can't find!</font>");
     }
 }
 
@@ -602,15 +632,15 @@ void MainWindow::on_openFilePbn_clicked()
 
 void MainWindow::on_addWordSentPbn_clicked()
 {
-    if(wordSentList_.isEmpty()) {
+    if(wordSentListInfo_.isEmpty()) {
         return;
     }
     QString repoPath = getRepoPathByName(repoPathName_);
     QString currentFile = repoPath + "/" + subDirName_ + "/" + currentFile_;
     for(int i = 0; i < ui->addList->count(); ++i) {
-        for(int j = 0; j < wordSentList_.size(); ++j){
-            if(ui->addList->item(i)->text() == wordSentList_.at(j).m_WordSent){
-                WordSentInfo wordSent = wordSentList_.at(j);
+        for(int j = 0; j < wordSentListInfo_.size(); ++j){
+            if(ui->addList->item(i)->text() == wordSentListInfo_.at(j).m_WordSent){
+                WordSentInfo wordSent = wordSentListInfo_.at(j);
                 if(wordSent.m_isWord) {
                     if(operateFile_->appendWord(currentFile, wordSent)) {
                         appendTextToLog("添加 [" + wordSent.m_WordSent + "] 成功!");
@@ -633,6 +663,7 @@ void MainWindow::on_addWordSentPbn_clicked()
         }
     }
     ui->addList->clear();
+    wordSentListInfo_.clear();
     wordSentList_.clear();
     ui->textEdit->clear();
 }
@@ -757,5 +788,4 @@ void MainWindow::on_syncPbn_clicked()
         appendTextToLog(QDateTime::currentDateTime().toString("[HH:mm:ss]") + u8" 关闭自动同步 !");
         ui->syncPbn->setStyleSheet("");
     }
-
 }
