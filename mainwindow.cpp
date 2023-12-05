@@ -75,16 +75,11 @@ void MainWindow::start(){
     // 添加Ctrl + C的过滤
     winEventFilter_->setSymbols(userInfo_.m_Symbols);
     connect(winEventFilter_,&WinEventFilter::sendWords,this, &MainWindow::getWordsSlot);
-    // network
-//    netWorkAccess_->setTranslateWeb(userInfo_.m_TranslateWeb);
-//    connect(netWorkAccess_,&NetworkAccess::sendWordInfo,this, &MainWindow::addWordListSlot);
-//    connect(netWorkAccess_,&NetworkAccess::sendSentenceInfo,this, &MainWindow::addSentenceListSlot);
     // repo combox
     initRepoAndFilePathCombox();
     // sub combox
     updateSubDirCombox();
 }
-
 
 void MainWindow::initConfInfo() {
     QString iniPath, confDirPath;
@@ -214,6 +209,7 @@ void MainWindow::getWordsSlot(WordsType status, QString words)
         appendWordSentList(words);
         connect(contrlThr,&Controller::sendSent,this, &MainWindow::addSentenceListSlot);
         connect(contrlThr,&Controller::sendWord,this, &MainWindow::addWordListSlot);
+        connect(contrlThr,&Controller::sigControllerLog,this, &MainWindow::appendTextToLog);
     }
     else if(status == IsSentence) {
         QStringList list = words.split("\n");
@@ -223,7 +219,7 @@ void MainWindow::getWordsSlot(WordsType status, QString words)
             appendWordSentList(words);
             contrlThr->operateSent(userInfo_.m_TranslateWeb, words);
             connect(contrlThr,&Controller::sendSent,this, &MainWindow::addSentenceListSlot);
-            connect(contrlThr,&Controller::sendWord,this, &MainWindow::addWordListSlot);
+            connect(contrlThr,&Controller::sigControllerLog,this, &MainWindow::appendTextToLog);
         }else{
             for(int i = 0; i < list.size(); ++i){
                 if(isWord(list.at(i))) {
@@ -231,15 +227,15 @@ void MainWindow::getWordsSlot(WordsType status, QString words)
                     Controller *contrlThr = new Controller;
                     appendWordSentList(list.at(i));
                     contrlThr->operateWord(userInfo_.m_TranslateWeb, list.at(i));
-                    connect(contrlThr,&Controller::sendSent,this, &MainWindow::addSentenceListSlot);
                     connect(contrlThr,&Controller::sendWord,this, &MainWindow::addWordListSlot);
+                    connect(contrlThr,&Controller::sigControllerLog,this, &MainWindow::appendTextToLog);
                 }else{
                     //                    netWorkAccess_->accessSentence(list.at(i));
                     Controller *contrlThr = new Controller;
                     appendWordSentList(list.at(i));
                     contrlThr->operateSent(userInfo_.m_TranslateWeb, list.at(i));
                     connect(contrlThr,&Controller::sendSent,this, &MainWindow::addSentenceListSlot);
-                    connect(contrlThr,&Controller::sendWord,this, &MainWindow::addWordListSlot);
+                    connect(contrlThr,&Controller::sigControllerLog,this, &MainWindow::appendTextToLog);
                 }
             }
 

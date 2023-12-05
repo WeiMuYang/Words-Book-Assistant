@@ -64,6 +64,7 @@ QString NetworkAccess::getWordPhonetic(QString phoneticStr) {
 }
 
 void NetworkAccess::analysisWordInfo(const QByteArray& Data) {
+    emit sigNetworkAccessLog("正在解析单词！");
     QString dataStr = QString(Data);
     QStringList listStr = dataStr.split(wordSplit);
     // 当前单词信息
@@ -73,22 +74,20 @@ void NetworkAccess::analysisWordInfo(const QByteArray& Data) {
         curWordInfo.m_WordSent = wordSentence_;
         curWordInfo.m_Phonetic_UK = getWordPhonetic(listStr.first());
         for(int i = 1; i < listStr.size()-1; ++i) {
-//            qDebug() << listStr.at(i);
             curWordInfo.m_Translation.append(delWordExCharacters(listStr.at(i)));
         }
         int pos = listStr.last().indexOf("</li>");
         curWordInfo.m_Translation.append(delWordExCharacters(listStr.last().remove(pos+5, listStr.last().size())));
-//        qDebug() << curWordInfo.m_Phonetic_UK;
-//        qDebug() << curWordInfo.m_Translation;
         emit sendWordInfo(curWordInfo);
     }
     else{
-        emit sigNetworkAccessLog("分割HTML字符串出错！");
+        emit sigNetworkAccessLog("翻译单词出错，未查到 \"" + wordSentence_ + "\"！");
     }
 }
 
 // Sentence
 void NetworkAccess::analysisSentenceInfo(const QByteArray& Data) {
+    emit sigNetworkAccessLog("正在解析句子！");
     QString dataStr = QString(Data);
     int pos = dataStr.indexOf("trans-content");
     dataStr = dataStr.remove(0, pos);
@@ -105,7 +104,7 @@ void NetworkAccess::analysisSentenceInfo(const QByteArray& Data) {
         emit sendSentenceInfo(curWordInfo);
     }
     else{
-        emit sigNetworkAccessLog("分割HTML字符串出错！");
+        emit sigNetworkAccessLog("翻译句子出错，未查到 \"" + wordSentence_ + "\"！");
     }
 }
 
