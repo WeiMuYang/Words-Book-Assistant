@@ -18,7 +18,7 @@ public:
     int getLastmodifiedTimeFileNumSubDir(const QString &path,const QString &dirName,QString& lastModefyFile);
     bool createMarkdownFile(const QString& FullPath, QString& currentFileName);
     int getCurrentFileWordNum(const QString& path);
-
+    bool getCurrentFileWordList(const QString &path, QStringList& list);
 
 public slots:
     bool appendWord(const QString& path,WordSentInfo wordInfo);

@@ -41,7 +41,7 @@ public:
     void changNumStyle(bool flags);
     void changSubPathStyle(bool flags);
     void changRepoComStyle(bool flags);
-    bool addWordSent2List(WordSentInfo wordInfo);
+
     void updateAddListWgt();
     void delWordListDataByName(QString name);
 
@@ -51,6 +51,7 @@ public:
     void setSampleViewByScreenRes();
     bool isWord(QString text);
     bool appendWordSentList(QString s);
+    bool isNotAtMarkdown(QString name);
 public slots:
     void getWordsSlot(WordsType status, QString words);
     void initActions();
@@ -77,6 +78,8 @@ public slots:
 
     void syncAddTimelySlot();
 
+    bool addWordSent2ListSlot(WordSentInfo wordInfo);
+
 private slots:
     void on_toolButton_clicked();
     void on_openFilePbn_clicked();
@@ -101,14 +104,10 @@ private:
     QString repoPathName_;
     QString subDirName_;
     QString currentFile_;
-    int currentWordCount_;
-
-
     BoxSelect boxSelect_;
 
     bool isStayTop_{false};
     int simpleViewNum_{0};
-
 
     QLabel* pStatusLabelIcon_;
     QLabel* pStatusLabelMsg_;
@@ -117,6 +116,10 @@ private:
 
     QTimer *timerSync_;
     bool isSyncStart_{false};
+
+
+    int currentWordCount_;
+    QStringList currentWordList_;
 
 };
 #endif // MAINWINDOW_H

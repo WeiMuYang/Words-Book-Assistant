@@ -81,6 +81,9 @@ void NetworkAccess::analysisWordInfo(const QByteArray& Data) {
         emit sendWordInfo(curWordInfo);
     }
     else{
+        curWordInfo.m_WordSent = wordSentence_;
+        curWordInfo.m_Translation.append("Can't find !");
+        emit sendWordInfo(curWordInfo);
         emit sigNetworkAccessLog("翻译单词出错，未查到 \"" + wordSentence_ + "\"！");
     }
 }
@@ -104,6 +107,11 @@ void NetworkAccess::analysisSentenceInfo(const QByteArray& Data) {
         emit sendSentenceInfo(curWordInfo);
     }
     else{
+        WordSentInfo curWordInfo;
+        curWordInfo.m_isWord = false;
+        curWordInfo.m_WordSent = wordSentence_;
+        curWordInfo.m_Translation.append("Can't find !");
+        emit sendSentenceInfo(curWordInfo);
         emit sigNetworkAccessLog("翻译句子出错，未查到 \"" + wordSentence_ + "\"！");
     }
 }

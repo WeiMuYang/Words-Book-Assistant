@@ -11,7 +11,7 @@ int printscreeninfo()
 {
     QDesktopWidget *dwsktopwidget = QApplication::desktop();
     QRect deskrect = dwsktopwidget->availableGeometry();
-    QRect screenrect = dwsktopwidget->screenGeometry();
+//    QRect screenrect = dwsktopwidget->screenGeometry();
     return deskrect.width();
 }
 
@@ -94,7 +94,7 @@ void MainWindow::initConfInfo() {
 }
 
 void MainWindow::initActions() {
-    connect(ui->actionAbout,&QAction::triggered, [&](){ aboutDlg_->show(); });
+    connect(ui->actionAbout,&QAction::triggered, [&](){ aboutDlg_->show();});
 
     ui->actionDelListItem->setShortcut(QKeySequence::Delete);
     connect(ui->actionDelListItem, &QAction::triggered, this, &MainWindow::delItemFromAddListSlot);
@@ -205,35 +205,31 @@ void MainWindow::getWordsSlot(WordsType status, QString words)
 {
     if(status == IsWord){
         Controller *contrlThr = new Controller;
-        contrlThr->operateWord(userInfo_.m_TranslateWeb, words);
         appendWordSentList(words);
-        connect(contrlThr,&Controller::sendSent,this, &MainWindow::addSentenceListSlot);
+        emit contrlThr->operateWord(userInfo_.m_TranslateWeb, words);
         connect(contrlThr,&Controller::sendWord,this, &MainWindow::addWordListSlot);
         connect(contrlThr,&Controller::sigControllerLog,this, &MainWindow::appendTextToLog);
     }
     else if(status == IsSentence) {
         QStringList list = words.split("\n");
         if(list.size() <= 1){
-            //            netWorkAccess_->accessSentence(words);
             Controller *contrlThr = new Controller;
             appendWordSentList(words);
-            contrlThr->operateSent(userInfo_.m_TranslateWeb, words);
+            emit contrlThr->operateSent(userInfo_.m_TranslateWeb, words);
             connect(contrlThr,&Controller::sendSent,this, &MainWindow::addSentenceListSlot);
             connect(contrlThr,&Controller::sigControllerLog,this, &MainWindow::appendTextToLog);
         }else{
             for(int i = 0; i < list.size(); ++i){
                 if(isWord(list.at(i))) {
-                    //                    netWorkAccess_->accessWord(list.at(i));
                     Controller *contrlThr = new Controller;
                     appendWordSentList(list.at(i));
-                    contrlThr->operateWord(userInfo_.m_TranslateWeb, list.at(i));
+                    emit contrlThr->operateWord(userInfo_.m_TranslateWeb, list.at(i));
                     connect(contrlThr,&Controller::sendWord,this, &MainWindow::addWordListSlot);
                     connect(contrlThr,&Controller::sigControllerLog,this, &MainWindow::appendTextToLog);
                 }else{
-                    //                    netWorkAccess_->accessSentence(list.at(i));
                     Controller *contrlThr = new Controller;
                     appendWordSentList(list.at(i));
-                    contrlThr->operateSent(userInfo_.m_TranslateWeb, list.at(i));
+                    emit contrlThr->operateSent(userInfo_.m_TranslateWeb, list.at(i));
                     connect(contrlThr,&Controller::sendSent,this, &MainWindow::addSentenceListSlot);
                     connect(contrlThr,&Controller::sigControllerLog,this, &MainWindow::appendTextToLog);
                 }
@@ -243,8 +239,7 @@ void MainWindow::getWordsSlot(WordsType status, QString words)
     }
 }
 
-
-bool MainWindow::addWordSent2List(WordSentInfo wordInfo){
+bool MainWindow::addWordSent2ListSlot(WordSentInfo wordInfo){
     for(int i = 0; i < wordSentListInfo_.size(); ++i) {
         if(wordSentListInfo_.at(i).m_WordSent == wordInfo.m_WordSent){
             appendTextToLog(wordInfo.m_WordSent + u8" 已存在 !");
@@ -258,7 +253,6 @@ bool MainWindow::addWordSent2List(WordSentInfo wordInfo){
 void MainWindow::updateAddListWgt()
 {
     ui->addList->clear();
-//    wordSentListInfo_
     for(int i = 0; i < wordSentList_.size(); ++i){
         addWord2UiListSlot(wordSentList_.at(i));
     }
@@ -268,23 +262,14 @@ void MainWindow::delWordListDataByName(QString name){
     for(int i = 0; i < wordSentList_.size(); ++i){
         if(name == wordSentList_.at(i)) {
             wordSentList_.removeAt(i);
-//            wordSentList_.removeAt()
             break;
         }
     }
 }
 
 void MainWindow::addWordListSlot(WordSentInfo wordInfo){
-    if(!addWordSent2List(wordInfo)) {
+    if(!addWordSent2ListSlot(wordInfo))
         return;
-    }
-//    QListWidgetItem *pItem = new QListWidgetItem;
-//    QString data = wordInfo.m_WordSent;
-//    pItem->setSizeHint(QSize(20,20 * multiple_));
-//    pItem->setText(data);
-//    pItem->setToolTip(data);
-
-//    ui->addList->addItem(pItem);
 }
 
 void MainWindow::addWord2UiListSlot(QString wordInfo){
@@ -298,15 +283,8 @@ void MainWindow::addWord2UiListSlot(QString wordInfo){
 
 
 void MainWindow::addSentenceListSlot(WordSentInfo Sentence) {
-    if(!addWordSent2List(Sentence))
+    if(!addWordSent2ListSlot(Sentence))
         return;
-//    QListWidgetItem *pItem = new QListWidgetItem;
-//    QString data = Sentence.m_WordSent;
-//    pItem->setSizeHint(QSize(20,20 * multiple_));
-//    pItem->setText(data);
-//    pItem->setToolTip(data);
-
-//    ui->addList->addItem(pItem);
 }
 
 void MainWindow::setWindowStyle()
@@ -348,31 +326,30 @@ void MainWindow::itemEnteredSlot(QListWidgetItem *item)
 {
     QString name = item->text();
     WordSentInfo wordInfo;
-    bool isInListInfo = false;
     for (int i = 0; i < wordSentListInfo_.size(); ++i) {
         if(wordSentListInfo_.at(i).m_WordSent == name) {
-            isInListInfo = true;
-            wordInfo = wordSentListInfo_.at(i);
-            ui->textEdit->clear();
-            if(wordInfo.m_isWord) {
+            if(wordSentListInfo_.at(i).m_Translation.at(0) != "Can't find !") {
+                wordInfo = wordSentListInfo_.at(i);
+                ui->textEdit->clear();
+                if(wordInfo.m_isWord) {
+                    ui->textEdit->append("<font color=\"#00FFFF\">"
+                                         + wordInfo.m_WordSent + "</font> /"
+                                         + wordInfo.m_Phonetic_UK +"/");
+                } else {
+                    ui->textEdit->append("<font color=\"#00FFFF\">"
+                                         + wordInfo.m_WordSent + "</font>");
+                }
+                for(int i = 0; i < wordInfo.m_Translation.size(); ++i) {
+                    ui->textEdit->append("- " + wordInfo.m_Translation.at(i));
+                }
+            }else {
+                ui->textEdit->clear();
                 ui->textEdit->append("<font color=\"#00FFFF\">"
-                                     + wordInfo.m_WordSent + "</font> /"
-                                     + wordInfo.m_Phonetic_UK +"/");
-            } else {
-                ui->textEdit->append("<font color=\"#00FFFF\">"
-                                     + wordInfo.m_WordSent + "</font>");
-            }
-            for(int i = 0; i < wordInfo.m_Translation.size(); ++i) {
-                ui->textEdit->append("- " + wordInfo.m_Translation.at(i));
+                                     + name + "</font>");
+                ui->textEdit->append("<font color=\"#FF0000\"> - Can't find !</font>");
             }
             break;
         }
-    }
-    if (!isInListInfo) {
-        ui->textEdit->clear();
-        ui->textEdit->append("<font color=\"#00FFFF\">"
-                             + name + "</font>");
-        ui->textEdit->append("<font color=\"#FF0000\"> - Can't find!</font>");
     }
 }
 
@@ -486,6 +463,7 @@ void MainWindow::setSubPathSlot(QString currentStr)
         whoIsBoxSelection(BoxSelect::SubCombox);
     }else{
         currentWordCount_ = operateFile_->getCurrentFileWordNum(repoPath + "/" + subDirName_ + "/" + currentFile_);
+        operateFile_->getCurrentFileWordList(repoPath + "/" + subDirName_ + "/" + currentFile_, currentWordList_);
         disconnect(ui->numSpinBox,QOverload<int>::of(&QSpinBox::valueChanged),this,&MainWindow::numSpinBoxValueChangedSlot);
         ui->numSpinBox->setValue(num);
         connect(ui->numSpinBox,QOverload<int>::of(&QSpinBox::valueChanged),this,&MainWindow::numSpinBoxValueChangedSlot);
@@ -503,6 +481,7 @@ void MainWindow::whoIsBoxSelection(BoxSelect select)
         changSubPathStyle(false);
         changNumStyle(false);
         currentWordCount_ = -1;
+        currentWordList_.clear();
         break;
 
     case BoxSelect::SubCombox:
@@ -510,6 +489,7 @@ void MainWindow::whoIsBoxSelection(BoxSelect select)
         changNumStyle(false);
         changRepoComStyle(false);
         currentWordCount_ = -1;
+        currentWordList_.clear();
         break;
     case BoxSelect::NumSpinBox:
         changSubPathStyle(false);
@@ -521,6 +501,7 @@ void MainWindow::whoIsBoxSelection(BoxSelect select)
         changNumStyle(false);
         changRepoComStyle(false);
         currentWordCount_ = -1;
+        currentWordList_.clear();
         break;
     }
 }
@@ -564,9 +545,11 @@ void MainWindow::numSpinBoxValueChangedSlot(int num)
         if(currentFile_.size() > 3 && currentFile_.right(2) == "md"){
             appendTextToLog(u8"当前文档为：" + currentFile_);
             currentWordCount_ = operateFile_->getCurrentFileWordNum(repoPath + "/" + subDirName_ + "/" + currentFile_);
+            operateFile_->getCurrentFileWordList(repoPath + "/" + subDirName_ + "/" + currentFile_, currentWordList_);
         }else{
             appendTextToLog(u8"当前目录为：" + currentFile_);
             currentWordCount_ = -1;
+            currentWordList_.clear();
         }
         whoIsBoxSelection(BoxSelect::NumSpinBox);
         setStatusBar("",true);
@@ -625,6 +608,15 @@ void MainWindow::on_openFilePbn_clicked()
     openExPro_->OpenMarkdownAndDirSlot(repoPath + "/" + subDirName_ + "/" + currentFile_);
 }
 
+bool MainWindow::isNotAtMarkdown(QString name) {
+    for(int i = 0; i < currentWordList_.size(); i++) {
+//      不区分大小写比较
+        if(currentWordList_.at(i).compare(name, Qt::CaseInsensitive) == 0){
+            return false;
+        }
+    }
+    return true;
+}
 
 void MainWindow::on_addWordSentPbn_clicked()
 {
@@ -633,14 +625,17 @@ void MainWindow::on_addWordSentPbn_clicked()
     }
     QString repoPath = getRepoPathByName(repoPathName_);
     QString currentFile = repoPath + "/" + subDirName_ + "/" + currentFile_;
+
     for(int i = 0; i < ui->addList->count(); ++i) {
         for(int j = 0; j < wordSentListInfo_.size(); ++j){
             if(ui->addList->item(i)->text() == wordSentListInfo_.at(j).m_WordSent){
+                if(isNotAtMarkdown(ui->addList->item(i)->text())) {
                 WordSentInfo wordSent = wordSentListInfo_.at(j);
                 if(wordSent.m_isWord) {
                     if(operateFile_->appendWord(currentFile, wordSent)) {
                         appendTextToLog("添加 [" + wordSent.m_WordSent + "] 成功!");
                         currentWordCount_++;
+                        currentWordList_.append(wordSent.m_WordSent);
                         pStatusLabelWordCount_->setText(QString::number( currentWordCount_) + "个");
                     }else{
                         appendTextToLog("添加 [" + wordSent.m_WordSent + "] 失败!");
@@ -648,6 +643,7 @@ void MainWindow::on_addWordSentPbn_clicked()
                 } else {
                     if(operateFile_->appendSentence(currentFile, wordSent)) {
                         currentWordCount_++;
+                        currentWordList_.append(wordSent.m_WordSent);
                         pStatusLabelWordCount_->setText(QString::number( currentWordCount_) + "个");
                         appendTextToLog("添加 [" + wordSent.m_WordSent + "] 成功!");
                     }else{
@@ -655,6 +651,9 @@ void MainWindow::on_addWordSentPbn_clicked()
                     }
                 }
                 break;
+                }else{
+                    appendTextToLog("[" + ui->addList->item(i)->text() + "] 不可重复添加!");
+                }
             }
         }
     }

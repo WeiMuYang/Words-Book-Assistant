@@ -296,3 +296,26 @@ int FileOperation::getCurrentFileWordNum(const QString &path)
     return count;
 }
 
+bool FileOperation::getCurrentFileWordList(const QString &path, QStringList & list)
+{
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        qDebug() << "Failed to open file";
+        return false;
+    }
+
+    // 读取文件内容并统计字符串个数
+    QTextStream in(&file);
+    QString content = in.readAll();
+//    english-chinese-simplified/elastic>elastic</a>
+    QStringList slist = content.split("</a>");
+    for(int i = 0; i < slist.size() - 1 ; ++i) {
+        list.append(slist.at(i).split(">").last());
+    }
+
+    // 关闭文件
+    file.close();
+    return true;
+}
+
