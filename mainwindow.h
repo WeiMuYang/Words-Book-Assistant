@@ -6,6 +6,8 @@
 #include <QTextStream>
 #include <QLabel>
 #include <QTimer>
+#include <QSystemTrayIcon>
+#include <QCloseEvent>
 #include "win_event_filter.h"
 #include "file_operation.h"
 #include "network_access.h"
@@ -46,12 +48,12 @@ public:
     void delWordListDataByName(QString name);
 
     void setSampleView();
-
     void setNormalView();
     void setSampleViewByScreenRes();
     bool isWord(QString text);
     bool appendWordSentList(QString s);
     bool isNotAtMarkdown(QString name);
+    void initTray();
 public slots:
     void getWordsSlot(WordsType status, QString words);
     void initActions();
@@ -86,6 +88,11 @@ private slots:
     void on_addWordSentPbn_clicked();
     void on_createMarkdownPbn_clicked();
     void on_syncPbn_clicked();
+    void quitAppSlot();
+    void trayIconClickedSlot(QSystemTrayIcon::ActivationReason reason);
+
+protected:
+    void closeEvent(QCloseEvent *event);
 
 private:
     int screenWidth_;
@@ -120,6 +127,9 @@ private:
 
     int currentWordCount_;
     QStringList currentWordList_;
+
+    QSystemTrayIcon *trayIcon_;
+    QMenu *trayMenu_;
 
 };
 #endif // MAINWINDOW_H

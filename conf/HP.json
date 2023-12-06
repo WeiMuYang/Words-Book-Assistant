@@ -21,5 +21,5 @@
         "TranslateWeb": "https://dict.youdao.com/result?word=%word%&lang=en"
     },
     "?Symbols": " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~\n",
-    "Symbols": " ,-.:;[]_\n"
+    "Symbols": " ,-.:;[]'_\n"
 }

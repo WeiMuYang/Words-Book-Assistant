@@ -2,10 +2,10 @@
     "?RepoPath": "资源目录的路径，Desktop代表的是当前用户的桌面",
     "RepoPath": [
         {
-            "LELTS-Word": "H:/00-sync-file-work/04-IELTS/03-words"
+            "LELTS-Word": "H:/00-sync-file-work/04-IELTS-Word"
         },
         {
-            "Work-English": "H:/00-sync-file-work/04-Work-Word"
+            "Work-Word": "H:/00-sync-file-work/04-Work-Word"
         }
     ],
     "?Software": "软件名+路径",
@@ -21,5 +21,5 @@
         "TranslateWeb": "https://dict.youdao.com/result?word=%word%&lang=en"
     },
     "?Symbols": " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~\n",
-    "Symbols": " ,-.:;[]\n"
+    "Symbols": " ,-.:';[]_\n"
 }

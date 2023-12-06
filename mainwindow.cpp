@@ -11,7 +11,6 @@ int printscreeninfo()
 {
     QDesktopWidget *dwsktopwidget = QApplication::desktop();
     QRect deskrect = dwsktopwidget->availableGeometry();
-//    QRect screenrect = dwsktopwidget->screenGeometry();
     return deskrect.width();
 }
 
@@ -24,6 +23,8 @@ MainWindow::MainWindow(QWidget *parent,QApplication* app)
     ui->setupUi(this);
     multiple_ = 2;
     screenWidth_ = printscreeninfo();
+    // 0. 托盘
+    initTray();
     // 1. 设置界面风格
     initScreenResNormal();
     setWindowStyle();
@@ -63,8 +64,45 @@ MainWindow::MainWindow(QWidget *parent,QApplication* app)
     connect(openExPro_,&OpenExProgram::sigOpenExProLog,this, &MainWindow::appendTextToLog);
     connect(winEventFilter_,&WinEventFilter::sigWinEvenFilterLog,this, &MainWindow::appendTextToLog);
     connect(operateFile_,&FileOperation::sigFileOperationLog,this, &MainWindow::appendTextToLog);
-
     start();
+}
+
+void MainWindow::initTray() {
+    trayIcon_ = new QSystemTrayIcon(this);
+    trayIcon_->setIcon(QIcon(":/qss/icon/word-assistant.ico"));
+    trayMenu_ = new QMenu(this);
+    QAction *showAction = new QAction("显  示", this);
+    QAction *quitAction = new QAction("退  出", this);
+    trayMenu_->addAction(showAction);
+    trayMenu_->addAction(quitAction);
+    trayIcon_->setContextMenu(trayMenu_);
+    connect(showAction, &QAction::triggered, this, &MainWindow::show);
+    connect(quitAction, &QAction::triggered, this, &MainWindow::quitAppSlot);
+    connect(trayIcon_, &QSystemTrayIcon::activated, this, &MainWindow::trayIconClickedSlot);
+    trayIcon_->show();
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    if (trayIcon_->isVisible()) {
+        hide();
+        event->ignore();
+    }
+}
+
+void MainWindow::quitAppSlot() {
+    QApplication::quit();
+}
+
+void MainWindow::trayIconClickedSlot(QSystemTrayIcon::ActivationReason reason)
+{
+    if (reason == QSystemTrayIcon::Trigger) {
+        // 单击操作
+        show();
+    } else if (reason == QSystemTrayIcon::DoubleClick) {
+        // 双击操作
+        show();
+    }
 }
 
 void MainWindow::start(){
@@ -82,8 +120,26 @@ void MainWindow::start(){
 }
 
 void MainWindow::initConfInfo() {
+    iniInfo_.m_Date.clear();
+    iniInfo_.m_IniPath.clear();
+    iniInfo_.m_HostName.clear();
+    iniInfo_.m_RecentFile.clear();
+    iniInfo_.m_Version.clear();
+    iniInfo_.m_Date.clear();
+
+    userInfo_.m_UserPath.clear();
+    userInfo_.m_RepoPathList.clear();
+    userInfo_.m_TyporaPath.clear();
+    userInfo_.m_VsCodePath.clear();
+    userInfo_.m_CambridgeWordWeb.clear();
+    userInfo_.m_CambridgeSentWeb.clear();
+    userInfo_.m_TranslateWeb.clear();
+    userInfo_.m_PronunciationWeb.clear();
+    userInfo_.m_Symbols.clear();
+
     QString iniPath, confDirPath;
     getConfPath(iniPath, confDirPath);
+
     if(operateFile_->readIniFile(iniPath, iniInfo_)){
         if(!operateFile_->readUserFile(confDirPath + "/" + iniInfo_.m_HostName + ".json", userInfo_)){
             appendTextToLog("读取用户文件失败");
@@ -268,6 +324,9 @@ void MainWindow::delWordListDataByName(QString name){
 }
 
 void MainWindow::addWordListSlot(WordSentInfo wordInfo){
+    if(wordInfo.m_Phonetic_UK.contains("http")) {
+            wordInfo.m_Phonetic_UK.clear();
+    }
     if(!addWordSent2ListSlot(wordInfo))
         return;
 }
@@ -331,7 +390,7 @@ void MainWindow::itemEnteredSlot(QListWidgetItem *item)
             if(wordSentListInfo_.at(i).m_Translation.at(0) != "Can't find !") {
                 wordInfo = wordSentListInfo_.at(i);
                 ui->textEdit->clear();
-                if(wordInfo.m_isWord) {
+                if(wordInfo.m_isWord && !wordInfo.m_Phonetic_UK.isEmpty()) {
                     ui->textEdit->append("<font color=\"#00FFFF\">"
                                          + wordInfo.m_WordSent + "</font> /"
                                          + wordInfo.m_Phonetic_UK +"/");
@@ -403,6 +462,7 @@ void MainWindow::initListWgt(){
 void MainWindow::initRepoAndFilePathCombox()
 {
     disconnect(ui->repoPathComBox,&QComboBox::currentTextChanged,this,&MainWindow::setRepoPathSlot);
+    ui->repoPathComBox->clear();
     for(int i = 0; i < userInfo_.m_RepoPathList.size(); ++i) {
         ui->repoPathComBox->addItem(userInfo_.m_RepoPathList.at(i).m_Name);
     }
@@ -590,7 +650,6 @@ void MainWindow::initStatusBar(){
     pStatusLabelWordCount_ = new QLabel("",this);
     pStatusLabelWordCount_->setAlignment(Qt::AlignHCenter);
 
-
     ui->statusBar->addWidget(pStatusLabelIcon_);
     ui->statusBar->addWidget(pStatusLabelMsg_);
     ui->statusBar->addWidget(pStatusLabelCurrentFile_);
@@ -610,7 +669,7 @@ void MainWindow::on_openFilePbn_clicked()
 
 bool MainWindow::isNotAtMarkdown(QString name) {
     for(int i = 0; i < currentWordList_.size(); i++) {
-//      不区分大小写比较
+    // 不区分大小写比较
         if(currentWordList_.at(i).compare(name, Qt::CaseInsensitive) == 0){
             return false;
         }

@@ -131,18 +131,24 @@ bool FileOperation::appendWord(const QString& path, WordSentInfo wordInfo){
         return false;
     }
     QTextStream stream(&file);
-
-    stream << "\n<p><a href=" << cambridgeWordWeb_
-           << wordInfo.m_WordSent << ">" << wordInfo.m_WordSent << "</a> &nbsp; &nbsp;/" << wordInfo.m_Phonetic_UK
-           << "/ &nbsp; &nbsp; <audio src=" << pronunciationWeb_ << wordInfo.m_WordSent
-           << " style=\"width:101px; height: 12px\"></audio> </p> \n";
+    if(!wordInfo.m_Phonetic_UK.isEmpty()) {
+        stream << "\n<p><a href=" << cambridgeWordWeb_
+               << wordInfo.m_WordSent << ">" << wordInfo.m_WordSent << "</a> &nbsp; &nbsp;/" << wordInfo.m_Phonetic_UK
+               << "/ &nbsp; &nbsp; <audio src=" << pronunciationWeb_ << wordInfo.m_WordSent
+               << " style=\"width:101px; height: 12px\"></audio> </p> \n";
+    }else {
+        stream << "\n<p><a href=" << cambridgeWordWeb_
+               << wordInfo.m_WordSent << ">" << wordInfo.m_WordSent << "</a> &nbsp; &nbsp;" << wordInfo.m_Phonetic_UK
+               << " &nbsp; &nbsp; <audio src=" << pronunciationWeb_ << wordInfo.m_WordSent
+               << " style=\"width:101px; height: 12px\"></audio> </p> \n";
+    }
 
     for(int i = 0; i < wordInfo.m_Translation.size(); ++i) {
         stream << "- " << wordInfo.m_Translation.at(i) << "\n";
     }
 
     file.close();
-//    emit sigFileOperationLog("单词已成功添加到文件中!");
+    //    emit sigFileOperationLog("单词已成功添加到文件中!");
     return true;
 }
 
@@ -158,11 +164,11 @@ bool FileOperation::appendSentence(const QString& path,WordSentInfo sentence){
     replaceSpaceSent = replaceSpaceSent.replace(" ","+");
 
     stream <<"\n<p><a href=" << cambridgeSentWeb_ << replaceSpaceSent
-           << ">" << sentence.m_WordSent << "</a> &nbsp; &nbsp;  &nbsp; &nbsp; <audio src=" << pronunciationWeb_
-           << QUrl::toPercentEncoding(sentence.m_WordSent) << " style=\"width:101px; height: 12px\"></audio> </p> \n";
+          << ">" << sentence.m_WordSent << "</a> &nbsp; &nbsp;  &nbsp; &nbsp; <audio src=" << pronunciationWeb_
+          << QUrl::toPercentEncoding(sentence.m_WordSent) << " style=\"width:101px; height: 12px\"></audio> </p> \n";
     stream <<"- "<< sentence.m_Translation.first() << "\n";
     file.close();
-//    emit sigFileOperationLog("句子已成功追加到文件中!");
+    //    emit sigFileOperationLog("句子已成功追加到文件中!");
     return true;
 }
 
@@ -308,7 +314,7 @@ bool FileOperation::getCurrentFileWordList(const QString &path, QStringList & li
     // 读取文件内容并统计字符串个数
     QTextStream in(&file);
     QString content = in.readAll();
-//    english-chinese-simplified/elastic>elastic</a>
+    //    english-chinese-simplified/elastic>elastic</a>
     QStringList slist = content.split("</a>");
     for(int i = 0; i < slist.size() - 1 ; ++i) {
         list.append(slist.at(i).split(">").last());
