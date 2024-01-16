@@ -33,6 +33,8 @@ MainWindow::MainWindow(QWidget *parent,QApplication* app)
     aboutDlg_ = new AboutDialog(this);
     openExPro_ = new OpenExProgram;
     netWorkAccess_ = new NetworkAccess(this);
+    createMarkdownAndSubDirDlg_ = new CreateMarkdownAndSubDir(this);
+    confFileOp_ = new ConfFileOperation(this);
     initActions();
     initStatusBar();
 
@@ -64,6 +66,16 @@ MainWindow::MainWindow(QWidget *parent,QApplication* app)
     connect(openExPro_,&OpenExProgram::sigOpenExProLog,this, &MainWindow::appendTextToLog);
     connect(winEventFilter_,&WinEventFilter::sigWinEvenFilterLog,this, &MainWindow::appendTextToLog);
     connect(operateFile_,&FileOperation::sigFileOperationLog,this, &MainWindow::appendTextToLog);
+    connect(confFileOp_,&ConfFileOperation::sigConfFileOpLog,this, &MainWindow::appendTextToLog);
+    connect(createMarkdownAndSubDirDlg_,&CreateMarkdownAndSubDir::sigCreateMarkdownAndDirLog,this,&MainWindow::appendTextToLog);
+
+    // createMarkdownDlg
+    connect(createMarkdownAndSubDirDlg_,&CreateMarkdownAndSubDir::sigCreateType,this,&MainWindow::createMarkdownAndSubDirSlot);
+    // createMarkdownDlg
+    connect(createMarkdownAndSubDirDlg_,&CreateMarkdownAndSubDir::sigOpenTempleMarkdown,[this](QString path) {
+        openExPro_->OpenMarkdownAndDirSlot(path);
+    });
+
     start();
 }
 
@@ -140,8 +152,8 @@ void MainWindow::initConfInfo() {
     QString iniPath, confDirPath;
     getConfPath(iniPath, confDirPath);
 
-    if(operateFile_->readIniFile(iniPath, iniInfo_)){
-        if(!operateFile_->readUserFile(confDirPath + "/" + iniInfo_.m_HostName + ".json", userInfo_)){
+    if(confFileOp_->readIniFile(iniPath, iniInfo_)){
+        if(!confFileOp_->readUserFile(confDirPath + "/" + iniInfo_.m_HostName + ".json", userInfo_)){
             appendTextToLog("读取用户文件失败");
         }
     }else {
@@ -209,6 +221,13 @@ void MainWindow::initActions() {
     //actionAddWord
     ui->actionAddWord->setShortcut(QKeySequence("Ctrl+A"));
     connect(ui->actionAddWord, &QAction::triggered, this, &MainWindow::on_addWordSentPbn_clicked);
+
+    // actionOpenSubDir
+    ui->actionOpenSubDir->setShortcut(QKeySequence("Alt+D"));
+    connect(ui->actionOpenSubDir, &QAction::triggered,[this]() {
+        QString repoPath = getRepoPathByName(repoPathName_);
+        openExPro_->OpenDirSlot(repoPath + "/" + subDirName_);
+    });
 }
 
 MainWindow::~MainWindow()
@@ -247,6 +266,9 @@ bool MainWindow::isWord(QString text){
 }
 
 bool MainWindow::appendWordSentList(QString s) {
+    if (s.isEmpty()) {
+        return false;
+    }
     for (int i = 0; i < wordSentList_.size(); i++) {
         if(wordSentList_.at(i) == s) {
             return false;
@@ -691,7 +713,7 @@ void MainWindow::on_addWordSentPbn_clicked()
                 if(isNotAtMarkdown(ui->addList->item(i)->text())) {
                 WordSentInfo wordSent = wordSentListInfo_.at(j);
                 if(wordSent.m_isWord) {
-                    if(operateFile_->appendWord(currentFile, wordSent)) {
+                    if(operateFile_->appendWord(currentFile, wordSent, userInfo_.m_CambridgeWordWeb, userInfo_.m_PronunciationWeb)) {
                         appendTextToLog("添加 [" + wordSent.m_WordSent + "] 成功!");
                         currentWordCount_++;
                         currentWordList_.append(wordSent.m_WordSent);
@@ -700,7 +722,7 @@ void MainWindow::on_addWordSentPbn_clicked()
                         appendTextToLog("添加 [" + wordSent.m_WordSent + "] 失败!");
                     }
                 } else {
-                    if(operateFile_->appendSentence(currentFile, wordSent)) {
+                    if(operateFile_->appendSentence(currentFile, wordSent, userInfo_.m_CambridgeSentWeb, userInfo_.m_PronunciationWeb)) {
                         currentWordCount_++;
                         currentWordList_.append(wordSent.m_WordSent);
                         pStatusLabelWordCount_->setText(QString::number( currentWordCount_) + "个");
@@ -765,10 +787,15 @@ void MainWindow::on_createMarkdownPbn_clicked()
     QString currentFileName;
     QString repoPath = getRepoPathByName(repoPathName_);
     QString path = repoPath + "/" + subDirName_ ;
-    if(operateFile_->createMarkdownFile(path, currentFileName)){
-        setSubPathSlot(subDirName_);
-        openExPro_->OpenMarkdownAndDirSlot(path + "/" + currentFile_);
-    }
+//    if(operateFile_->createMarkdownFile(path, currentFileName)){
+//        setSubPathSlot(subDirName_);
+//        openExPro_->OpenMarkdownAndDirSlot(path + "/" + currentFile_);
+//    }
+
+    createMarkdownAndSubDirDlg_->setSubDirPath(path);
+    createMarkdownAndSubDirDlg_->setWidth(screenWidth_);
+    createMarkdownAndSubDirDlg_->setRepoPath(repoPath);
+    createMarkdownAndSubDirDlg_->showWindow();
 }
 
 ///// action /////
@@ -843,3 +870,16 @@ void MainWindow::on_syncPbn_clicked()
         ui->syncPbn->setStyleSheet("");
     }
 }
+
+void MainWindow::createMarkdownAndSubDirSlot(int type, QString namePathAbs)
+{
+    if(1 == type) {
+        updateSubDirCombox();
+        QString repoPath = getRepoPathByName(repoPathName_);
+        openExPro_->OpenMarkdownAndDirSlot(repoPath + "/" + subDirName_ + "/" + currentFile_);
+    }else if (2 == type){
+        updateSubDirCombox();
+        openExPro_->OpenDirSlot(namePathAbs);
+    }
+}
+

@@ -15,6 +15,8 @@ RC_ICONS = "./qss/icon/word-assistant.ico"
 #msvc:QMAKE_CXXFLAGS += -execution-charset:utf-8
 SOURCES += \
     about_dialog.cpp \
+    conf_file_operate.cpp \
+    create_markdown_dir.cpp \
     file_operation.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -25,6 +27,8 @@ SOURCES += \
 
 HEADERS += \
     about_dialog.h \
+    conf_file_operate.h \
+    create_markdown_dir.h \
     data_type.h \
     file_operation.h \
     mainwindow.h \
@@ -35,6 +39,7 @@ HEADERS += \
 
 FORMS += \
     about_dialog.ui \
+    create_markdown_dir.ui \
     mainwindow.ui
 
 

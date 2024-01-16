@@ -9,10 +9,6 @@ class FileOperation : public QObject
 public:
     explicit FileOperation(QObject *parent = nullptr);
 
-    bool readIniFile(QString iniPath, IniInfo &iniInfo);
-    bool readUserFile(QString usrPath,UserInfo &userInfo);
-    void analysisJson(QJsonObject &rootObj,UserInfo &userInfo);
-
     QStringList getSubDirNames(QString TarPath);
     bool getFileNameByNum(QString fullPath, int fileNum, QString& fileName);
     int getLastmodifiedTimeFileNumSubDir(const QString &path,const QString &dirName,QString& lastModefyFile);
@@ -21,16 +17,18 @@ public:
     bool getCurrentFileWordList(const QString &path, QStringList& list);
 
 public slots:
-    bool appendWord(const QString& path,WordSentInfo wordInfo);
-    bool appendSentence(const QString& path, WordSentInfo sentence);
+    bool appendWord(const QString& path, WordSentInfo wordInfo, const QString& cambridgeWordWeb_,
+                                   const QString& pronunciationWeb_);
+    bool appendSentence(const QString& path,WordSentInfo sentence, const QString& cambridgeSentWeb_,
+                                       const QString& pronunciationWeb_);
 
 signals:
     void sigFileOperationLog(QString m);
 
 private:
-    QString cambridgeWordWeb_;
-    QString cambridgeSentWeb_;
-    QString pronunciationWeb_;
+//    QString cambridgeWordWeb_;
+//    QString cambridgeSentWeb_;
+//    QString pronunciationWeb_;
 };
 
 #endif // OPERATEFILE_H

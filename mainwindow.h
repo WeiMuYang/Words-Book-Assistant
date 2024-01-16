@@ -13,6 +13,8 @@
 #include "network_access.h"
 #include "about_dialog.h"
 #include "open_ex_program.h"
+#include "create_markdown_dir.h"
+#include "conf_file_operate.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -90,6 +92,7 @@ private slots:
     void on_syncPbn_clicked();
     void quitAppSlot();
     void trayIconClickedSlot(QSystemTrayIcon::ActivationReason reason);
+    void createMarkdownAndSubDirSlot(int type, QString namePathAbs);
 
 protected:
     void closeEvent(QCloseEvent *event);
@@ -130,6 +133,9 @@ private:
 
     QSystemTrayIcon *trayIcon_;
     QMenu *trayMenu_;
+
+    CreateMarkdownAndSubDir* createMarkdownAndSubDirDlg_;
+    ConfFileOperation* confFileOp_;
 
 };
 #endif // MAINWINDOW_H

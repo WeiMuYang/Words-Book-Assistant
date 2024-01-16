@@ -531,6 +531,7 @@
     <addaction name="actionModifySysFile"/>
     <addaction name="actionModifyConf"/>
     <addaction name="actionOpenRepo"/>
+    <addaction name="actionOpenSubDir"/>
     <addaction name="actionCreateBook"/>
     <addaction name="actionOpenBook"/>
     <addaction name="actionRestart"/>
@@ -629,6 +630,11 @@
   <action name="actionAddWord">
    <property name="text">
     <string>添加单词</string>
+   </property>
+  </action>
+  <action name="actionOpenSubDir">
+   <property name="text">
+    <string>打开子目录</string>
    </property>
   </action>
  </widget>
